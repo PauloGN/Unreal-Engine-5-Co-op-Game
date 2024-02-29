@@ -13,7 +13,12 @@ class AChronoQuestGameMode : public AGameModeBase
 
 public:
 	AChronoQuestGameMode();
+
+
+	UFUNCTION(BlueprintCallable)
+	void HostLanGame();
+
+	UFUNCTION(BlueprintCallable)
+	void JoinLanGame();
+
 };
-
-
-
