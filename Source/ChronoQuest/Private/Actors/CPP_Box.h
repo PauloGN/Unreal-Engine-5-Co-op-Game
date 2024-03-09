@@ -32,4 +32,8 @@ public:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	//Timer Replicated float
+	void DecreaseReplicatedFloat();
+	FTimerHandle testTimer;
+
 };

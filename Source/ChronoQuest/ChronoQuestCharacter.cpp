@@ -10,6 +10,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Net/UnrealNetwork.h"
+#include <Engine/StaticMeshActor.h>
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -65,6 +67,43 @@ void AChronoQuestCharacter::BeginPlay()
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+}
+
+void AChronoQuestCharacter::ServerRPCFunction_Implementation()
+{
+	if(HasAuthority())
+	{
+		if(sphereMesh == nullptr)
+		{
+			return;
+		}
+		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Server RPC"));
+
+		//Creates and sets actor settings
+		if(AStaticMeshActor* staticActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass()))
+		{
+			staticActor->SetReplicates(true);
+			staticActor->SetReplicateMovement(true);
+			staticActor->SetMobility(EComponentMobility::Movable);
+
+			const FVector forwardingVector = GetActorLocation() + GetActorRotation().Vector() * 100.0f;
+			const FVector UpwardingdingVector = GetActorUpVector() * 50.0f;
+			const FVector spawnLocation = forwardingVector + UpwardingdingVector;
+
+			staticActor->SetActorLocation(spawnLocation);
+			//Setting up component
+			UStaticMeshComponent* componetFromActor = staticActor->GetStaticMeshComponent();
+			if(componetFromActor)
+			{
+				componetFromActor->SetIsReplicated(true);
+				componetFromActor->SetSimulatePhysics(true);
+				if(sphereMesh != nullptr)
+				{
+					componetFromActor->SetStaticMesh(sphereMesh);
+				}
+			}
 		}
 	}
 }

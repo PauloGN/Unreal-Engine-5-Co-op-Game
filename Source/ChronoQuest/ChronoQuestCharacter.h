@@ -69,5 +69,13 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void ServerRPCFunction();
+
+	//Holder for assets
+	UPROPERTY(EditAnywhere)
+	UStaticMesh* sphereMesh;
+
 };
 

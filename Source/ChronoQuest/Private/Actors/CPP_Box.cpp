@@ -1,6 +1,4 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Actors/CPP_Box.h"
 #include "Net/UnrealNetwork.h"
 
@@ -27,6 +25,10 @@ void ACPP_Box::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Client"));
 	}
 
+	if(HasAuthority())
+	{
+		GetWorld()->GetTimerManager().SetTimer(testTimer, this, &ThisClass::DecreaseReplicatedFloat, 2.0f, false);
+	}
 }
 
 // Called every frame
@@ -59,3 +61,16 @@ void ACPP_Box::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 
 }
 
+void ACPP_Box::DecreaseReplicatedFloat()
+{
+	if(HasAuthority())
+	{
+		replicatedFloat -= 1.0f;
+		//calling on the server
+		OnRep_ReplicatedFloat();
+		if(replicatedFloat > 0.0f)
+		{
+			//GetWorld()->GetTimerManager().SetTimer(testTimer, this, &ThisClass::DecreaseReplicatedFloat, 2.0f, false);
+		}
+	}
+}
