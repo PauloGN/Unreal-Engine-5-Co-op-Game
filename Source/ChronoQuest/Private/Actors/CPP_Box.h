@@ -24,9 +24,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	//Replication VARIABLES
-	UPROPERTY(Replicated, BlueprintReadWrite)
+	UPROPERTY(ReplicatedUsing = OnRep_ReplicatedFloat, BlueprintReadWrite)
 	float replicatedFloat;
 
+	UFUNCTION(BlueprintCallable)
+	void OnRep_ReplicatedFloat();
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

@@ -18,7 +18,7 @@ void ACPP_Box::BeginPlay()
 	Super::BeginPlay();
 	SetReplicates(true);
 	SetReplicateMovement(true);
-
+	
 	if (HasAuthority())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("Server"));
@@ -33,6 +33,20 @@ void ACPP_Box::BeginPlay()
 void ACPP_Box::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+}
+
+void ACPP_Box::OnRep_ReplicatedFloat()
+{
+	if(HasAuthority())
+	{
+		FVector newLocation = GetActorLocation() + FVector(0.0f, 0.0f, 200.0f);
+		SetActorLocation(newLocation);
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Server notify"));
+	}else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, FString::Printf(TEXT("Client %d: Notify"), static_cast<int>(GPlayInEditorID)));
+	}
 
 }
 
