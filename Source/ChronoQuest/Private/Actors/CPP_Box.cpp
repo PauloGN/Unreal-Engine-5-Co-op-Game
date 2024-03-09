@@ -2,28 +2,22 @@
 
 
 #include "Actors/CPP_Box.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ACPP_Box::ACPP_Box()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	replicatedFloat = 100.0f;
 }
 
 // Called when the game starts or when spawned
 void ACPP_Box::BeginPlay()
 {
 	Super::BeginPlay();
-
-
-	
-}
-
-// Called every frame
-void ACPP_Box::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	SetReplicates(true);
+	SetReplicateMovement(true);
 
 	if (HasAuthority())
 	{
@@ -32,5 +26,22 @@ void ACPP_Box::Tick(float DeltaTime)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Client"));
 	}
+
+}
+
+// Called every frame
+void ACPP_Box::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+void ACPP_Box::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	//Especial Macro called for each variable that we designate to be replicated
+	DOREPLIFETIME(ACPP_Box, replicatedFloat);
+
 }
 

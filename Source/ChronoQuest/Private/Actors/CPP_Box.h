@@ -23,4 +23,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	//Replication VARIABLES
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	float replicatedFloat;
+
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 };

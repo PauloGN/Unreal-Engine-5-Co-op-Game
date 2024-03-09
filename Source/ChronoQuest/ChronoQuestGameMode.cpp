@@ -23,8 +23,7 @@ void AChronoQuestGameMode::HostLanGame()
 
 void AChronoQuestGameMode::JoinLanGame()
 {
-	APlayerController*  pc = GetGameInstance()->GetFirstLocalPlayerController();
-
+	APlayerController* pc = GetGameInstance()->GetFirstLocalPlayerController();
 	if(pc)
 	{
 		pc->ClientTravel("192.168.1.162",TRAVEL_Absolute);
