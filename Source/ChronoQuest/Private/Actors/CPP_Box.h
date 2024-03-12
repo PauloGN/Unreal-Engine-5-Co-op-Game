@@ -35,4 +35,10 @@ public:
 	//Timer Replicated float
 	void DecreaseReplicatedFloat();
 	FTimerHandle testTimer;
+
+	//Multicast RPC
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MulticastRPCExplode();
+
 };

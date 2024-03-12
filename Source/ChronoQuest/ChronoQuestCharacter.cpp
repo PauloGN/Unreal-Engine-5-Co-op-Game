@@ -79,41 +79,45 @@ void AChronoQuestCharacter::SpawnSphere()
 		{
 			return;
 		}
-		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Server RPC"));
-
 		//Creates and sets actor settings
-		if(AStaticMeshActor* staticActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass()))
+		if(AStaticMeshActor* staticMeshActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass()))
 		{
-			staticActor->SetReplicates(true);
-			staticActor->SetReplicateMovement(true);
-			staticActor->SetMobility(EComponentMobility::Movable);
+			staticMeshActor->SetReplicates(true);
+			staticMeshActor->SetReplicateMovement(true);
+			staticMeshActor->SetMobility(EComponentMobility::Movable);
 
 			const FVector forwardingVector = GetActorLocation() + GetActorRotation().Vector() * 100.0f;
 			const FVector UpwardingdingVector = GetActorUpVector() * 50.0f;
 			const FVector spawnLocation = forwardingVector + UpwardingdingVector;
 
-			staticActor->SetActorLocation(spawnLocation);
+			staticMeshActor->SetActorLocation(spawnLocation);
 			//Setting up component
-			UStaticMeshComponent* componetFromActor = staticActor->GetStaticMeshComponent();
-			if(componetFromActor)
+			UStaticMeshComponent* meshComponentFromActor = staticMeshActor->GetStaticMeshComponent();
+			if(meshComponentFromActor)
 			{
-				componetFromActor->SetIsReplicated(true);
-				componetFromActor->SetSimulatePhysics(true);
+				meshComponentFromActor->SetIsReplicated(true);
+				meshComponentFromActor->SetSimulatePhysics(true);
 				if(sphereMesh != nullptr)
 				{
-					componetFromActor->SetStaticMesh(sphereMesh);
+					meshComponentFromActor->SetStaticMesh(sphereMesh);
 				}
 			}
 		}
-
 	}
 }
 
 //Server RPC should be only executed on the server
-void AChronoQuestCharacter::ServerRPCFunction_Implementation()
+//Validation are executed before the implementation if it fails the implementation will not be executed, and the client who called the failed one will be disconnected from the game
+bool AChronoQuestCharacter::ServerRPCFunction_Validate(const int num)
 {
+	return (num < 100 && num >= 0);
+}
+void AChronoQuestCharacter::ServerRPCFunction_Implementation(const int num)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("Server RPC, %d"), num));
 	SpawnSphere();
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input

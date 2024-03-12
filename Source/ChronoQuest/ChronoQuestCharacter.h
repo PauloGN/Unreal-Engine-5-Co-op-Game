@@ -77,11 +77,12 @@ public:
 	 * \RPC - Remote Procedure Calls And Static Mesh
 	 */
 
-	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void ServerRPCFunction();
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
+	void ServerRPCFunction(const int num);
 
 	//Holder for assets
 	UPROPERTY(EditAnywhere)
 	UStaticMesh* sphereMesh;
+	
 };
 

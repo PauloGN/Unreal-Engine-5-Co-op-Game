@@ -28,6 +28,7 @@ void ACPP_Box::BeginPlay()
 	if(HasAuthority())
 	{
 		GetWorld()->GetTimerManager().SetTimer(testTimer, this, &ThisClass::DecreaseReplicatedFloat, 2.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(testTimer, this, &ThisClass::MulticastRPCExplode, 1.0f, false);
 	}
 }
 
@@ -70,5 +71,18 @@ void ACPP_Box::DecreaseReplicatedFloat()
 		{
 			//GetWorld()->GetTimerManager().SetTimer(testTimer, this, &ThisClass::DecreaseReplicatedFloat, 2.0f, false);
 		}
+	}
+}
+
+void ACPP_Box::MulticastRPCExplode_Implementation()
+{
+	if(HasAuthority())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::Printf(TEXT("Server %d: Multicast call"), static_cast<int>(GPlayInEditorID)));
+		GetWorld()->GetTimerManager().SetTimer(testTimer, this, &ThisClass::MulticastRPCExplode, 7.0f, false);
+
+	}else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, FString::Printf(TEXT("Client %d: Multicast call"), static_cast<int>(GPlayInEditorID)));
 	}
 }
