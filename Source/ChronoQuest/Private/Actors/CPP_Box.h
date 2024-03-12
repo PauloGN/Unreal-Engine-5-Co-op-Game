@@ -35,5 +35,4 @@ public:
 	//Timer Replicated float
 	void DecreaseReplicatedFloat();
 	FTimerHandle testTimer;
-
 };

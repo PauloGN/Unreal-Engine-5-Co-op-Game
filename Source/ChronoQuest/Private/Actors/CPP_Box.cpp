@@ -19,10 +19,10 @@ void ACPP_Box::BeginPlay()
 	
 	if (HasAuthority())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("Server"));
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("Box Say: Hello from Server"));
 	}else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Client"));
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Client:  Hello from client"));
 	}
 
 	if(HasAuthority())
@@ -49,7 +49,6 @@ void ACPP_Box::OnRep_ReplicatedFloat()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, FString::Printf(TEXT("Client %d: Notify"), static_cast<int>(GPlayInEditorID)));
 	}
-
 }
 
 void ACPP_Box::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -58,7 +57,6 @@ void ACPP_Box::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 
 	//Especial Macro called for each variable that we designate to be replicated
 	DOREPLIFETIME(ACPP_Box, replicatedFloat);
-
 }
 
 void ACPP_Box::DecreaseReplicatedFloat()

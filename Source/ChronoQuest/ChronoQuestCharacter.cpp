@@ -71,7 +71,7 @@ void AChronoQuestCharacter::BeginPlay()
 	}
 }
 
-void AChronoQuestCharacter::ServerRPCFunction_Implementation()
+void AChronoQuestCharacter::SpawnSphere()
 {
 	if(HasAuthority())
 	{
@@ -105,7 +105,14 @@ void AChronoQuestCharacter::ServerRPCFunction_Implementation()
 				}
 			}
 		}
+
 	}
+}
+
+//Server RPC should be only executed on the server
+void AChronoQuestCharacter::ServerRPCFunction_Implementation()
+{
+	SpawnSphere();
 }
 
 //////////////////////////////////////////////////////////////////////////

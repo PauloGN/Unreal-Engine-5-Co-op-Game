@@ -12,13 +12,12 @@ class AChronoQuestGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-	AChronoQuestGameMode();
 
+	AChronoQuestGameMode();
 
 	UFUNCTION(BlueprintCallable)
 	void HostLanGame();
 
 	UFUNCTION(BlueprintCallable)
 	void JoinLanGame();
-
 };

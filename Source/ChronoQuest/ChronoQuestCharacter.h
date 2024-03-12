@@ -64,11 +64,18 @@ protected:
 	// To add mapping context
 	virtual void BeginPlay();
 
+	UFUNCTION(BlueprintCallable)
+	void SpawnSphere();
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	/**
+	 * \RPC - Remote Procedure Calls And Static Mesh
+	 */
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void ServerRPCFunction();
@@ -76,6 +83,5 @@ public:
 	//Holder for assets
 	UPROPERTY(EditAnywhere)
 	UStaticMesh* sphereMesh;
-
 };
 
