@@ -80,17 +80,23 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
 	void ServerRPCFunction(const int num);
 
-	//Holder for assets
-	UPROPERTY(EditAnywhere)
-	UStaticMesh* sphereMesh;
+	//Client RPC
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void ClientRPCCall();
 
 	//Multicast RPC
 	FTimerHandle testTimer;
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void MulticastRPCExplode();
 
+	//Holder for assets
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* explosionEffect;
 
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* SmokeEffect;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMesh* sphereMesh;
 };
 

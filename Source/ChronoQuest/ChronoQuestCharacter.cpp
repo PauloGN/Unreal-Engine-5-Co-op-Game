@@ -87,9 +87,13 @@ void AChronoQuestCharacter::SpawnSphere()
 		{
 			return;
 		}
+		//Ownership
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Owner = this;
 		//Creates and sets actor settings
-		if(AStaticMeshActor* staticMeshActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass()))
+		if(AStaticMeshActor* staticMeshActor = GetWorld()->SpawnActor<AStaticMeshActor>(SpawnParameters))
 		{
+			//staticMeshActor->SetOwner();
 			staticMeshActor->SetReplicates(true);
 			staticMeshActor->SetReplicateMovement(true);
 			staticMeshActor->SetMobility(EComponentMobility::Movable);
@@ -111,6 +115,14 @@ void AChronoQuestCharacter::SpawnSphere()
 				}
 			}
 		}
+	}
+}
+
+void AChronoQuestCharacter::ClientRPCCall_Implementation()
+{
+	if(!IsRunningDedicatedServer() && SmokeEffect != nullptr)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SmokeEffect, GetActorLocation(), FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
 	}
 }
 
