@@ -13,6 +13,8 @@
 #include "Net/UnrealNetwork.h"
 #include <Engine/StaticMeshActor.h>
 
+#include "Kismet/GameplayStatics.h"
+
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -61,6 +63,12 @@ void AChronoQuestCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+
+	if(HasAuthority())
+	{
+		GetWorld()->GetTimerManager().SetTimer(testTimer, this, &ThisClass::MulticastRPCExplode, 2.0f, false);
+	}
+
 	//Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
@@ -103,6 +111,15 @@ void AChronoQuestCharacter::SpawnSphere()
 				}
 			}
 		}
+	}
+}
+
+void AChronoQuestCharacter::MulticastRPCExplode_Implementation()
+{
+	if (!IsRunningDedicatedServer() && explosionEffect != nullptr)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), explosionEffect, GetActorLocation(), FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
+		GetWorld()->GetTimerManager().SetTimer(testTimer, this, &ThisClass::MulticastRPCExplode, 2.0f, false);
 	}
 }
 

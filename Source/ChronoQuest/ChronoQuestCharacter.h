@@ -83,6 +83,14 @@ public:
 	//Holder for assets
 	UPROPERTY(EditAnywhere)
 	UStaticMesh* sphereMesh;
-	
+
+	//Multicast RPC
+	FTimerHandle testTimer;
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MulticastRPCExplode();
+
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* explosionEffect;
+
 };
 

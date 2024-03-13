@@ -37,8 +37,10 @@ public:
 	FTimerHandle testTimer;
 
 	//Multicast RPC
-
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void MulticastRPCExplode();
+
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* explosionEffect;
 
 };
