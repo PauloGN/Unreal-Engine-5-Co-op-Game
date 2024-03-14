@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "MultiplayerSessionsSubsystem.generated.h"
 
 /**
@@ -17,7 +18,16 @@ class UMultiplayerSessionsSubsystem : public UGameInstanceSubsystem
 public:
 
 	UMultiplayerSessionsSubsystem();
-
 	void Initialize(FSubsystemCollectionBase& Collection) override;
 	void Deinitialize() override;
+
+
+	//wid Get
+	UFUNCTION(BlueprintCallable)
+	void CreateServer(const FString& serverName);
+	UFUNCTION(BlueprintCallable)
+	void FindServer(const FString& serverName);
+
+	IOnlineSessionPtr sessionInterface;
+	bool bIsLanConnection = false;
 };
