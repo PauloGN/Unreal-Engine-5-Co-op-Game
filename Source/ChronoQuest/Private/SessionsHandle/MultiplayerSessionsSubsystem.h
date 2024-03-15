@@ -33,6 +33,7 @@ public:
 
 	//Session and server Settings
 	FString lastServerName;
+	FString serverNameToFind;
 	bool bCreateServerOnDestroy;
 	TSharedPtr<FOnlineSessionSearch> sessionSearch;
 
