@@ -2,7 +2,7 @@
 
 #include "SessionsHandle/MultiplayerSessionsSubsystem.h"
 #include "OnlineSubsystem.h"
-#include "OnlineSessionSettings.h"
+#include <Online/OnlineSessionNames.h>
 
 namespace 
 {
@@ -18,13 +18,14 @@ namespace
 UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem()
 {
 	PrintString(TEXT("Construction"));
+	bCreateServerOnDestroy = false;
+	lastServerName = "";
 }
 
 void UMultiplayerSessionsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-	//PrintString(TEXT("Initialized"));
 	IOnlineSubsystem* onlineSubsystem = IOnlineSubsystem::Get();
 
 	if(onlineSubsystem)
@@ -39,7 +40,10 @@ void UMultiplayerSessionsSubsystem::Initialize(FSubsystemCollectionBase& Collect
 		sessionInterface = onlineSubsystem->GetSessionInterface();
 		if(sessionInterface.IsValid())
 		{
-			PrintString(TEXT("Valid Session"));
+			//Bind Delegate functions
+			sessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &ThisClass::OnCreateSessionComplete);
+			sessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &ThisClass::OnDestroySessionComplete);
+			sessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &ThisClass::OnFindSessionsComplete);
 		}
 	}
 }
@@ -53,7 +57,6 @@ void UMultiplayerSessionsSubsystem::Deinitialize()
 
 void UMultiplayerSessionsSubsystem::CreateServer(const FString& serverName)
 {
-
 	if(serverName.IsEmpty())
 	{
 		PrintString(TEXT("Server Name can not be empty: ") + serverName);
@@ -69,6 +72,16 @@ void UMultiplayerSessionsSubsystem::CreateServer(const FString& serverName)
 	FName mySessionName = FName("Co-op ChronoQuest");
 	FOnlineSessionSettings sessionSettings;
 
+	//check if session already exists
+	FNamedOnlineSession* existingSession = sessionInterface->GetNamedSession(mySessionName);
+	if(existingSession)
+	{
+		lastServerName = serverName;
+		bCreateServerOnDestroy = true;
+		sessionInterface->DestroySession(mySessionName);
+		return;
+	}
+
 	sessionSettings.bAllowJoinInProgress = true;
 	sessionSettings.bIsDedicated = false;
 	sessionSettings.bShouldAdvertise = true;
@@ -76,22 +89,61 @@ void UMultiplayerSessionsSubsystem::CreateServer(const FString& serverName)
 	sessionSettings.bUseLobbiesIfAvailable = true;
 	sessionSettings.bUsesPresence = true;
 	sessionSettings.bAllowJoinViaPresence = true;
-
 	sessionSettings.bIsLANMatch = bIsLanConnection;
-
-	if(bIsLanConnection)
-	{
-		PrintString(TEXT("True"));
-		return;
-	}
-
-	PrintString(TEXT("false"));
-
+	
 	sessionInterface->CreateSession(0, mySessionName, sessionSettings);
-
 }
 
 void UMultiplayerSessionsSubsystem::FindServer(const FString& serverName)
 {
-	PrintString(TEXT("Find Server Called for: ") + serverName);
+	if (serverName.IsEmpty())
+	{
+		PrintString(TEXT("Server Name can not be empty: ") + serverName);
+		return;
+	}
+
+	sessionSearch = MakeShareable(new FOnlineSessionSearch);
+	//how do we want the search to be done
+	sessionSearch->bIsLanQuery = bIsLanConnection;
+	sessionSearch->MaxSearchResults = 9999;
+	sessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+
+	sessionInterface->FindSessions(0, sessionSearch.ToSharedRef());
+}
+
+void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasuccessful)
+{
+	PrintString(FString::Printf(TEXT("Resul: %d"), bWasuccessful));
+
+	if(bWasuccessful)
+	{
+		GetWorld()->ServerTravel("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");
+	}
+}
+
+void UMultiplayerSessionsSubsystem::OnDestroySessionComplete(FName SessionName, bool bWasuccessful)
+{
+	if(bCreateServerOnDestroy)
+	{
+		bCreateServerOnDestroy = false;
+		CreateServer(lastServerName);
+	}
+}
+
+void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasuccessful)
+{
+	if(!bWasuccessful)
+	{
+		return;
+	}
+
+	TArray<FOnlineSessionSearchResult> results = sessionSearch->SearchResults;
+	if(results.Num() > 0)
+	{
+		FString msg = FString::Printf(TEXT("Sessions found: %d"), results.Num());
+
+		PrintString(msg);
+		return;
+	}
+	PrintString("Nope no sessions");
 }

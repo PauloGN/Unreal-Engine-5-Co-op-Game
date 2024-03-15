@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "OnlineSessionSettings.h"
 #include "MultiplayerSessionsSubsystem.generated.h"
 
 /**
@@ -21,7 +22,6 @@ public:
 	void Initialize(FSubsystemCollectionBase& Collection) override;
 	void Deinitialize() override;
 
-
 	//wid Get
 	UFUNCTION(BlueprintCallable)
 	void CreateServer(const FString& serverName);
@@ -30,4 +30,14 @@ public:
 
 	IOnlineSessionPtr sessionInterface;
 	bool bIsLanConnection = false;
+
+	//Session and server Settings
+	FString lastServerName;
+	bool bCreateServerOnDestroy;
+	TSharedPtr<FOnlineSessionSearch> sessionSearch;
+
+	//Delegate calls
+	void OnCreateSessionComplete(FName SessionName, bool bWasuccessful);
+	void OnDestroySessionComplete(FName SessionName, bool bWasuccessful);
+	void OnFindSessionsComplete(bool bWasuccessful);
 };
