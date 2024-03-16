@@ -21,6 +21,7 @@ UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem()
 	bCreateServerOnDestroy = false;
 	lastServerName = "";
 	serverNameToFind = "";
+	mySessionName = FName("Co-op ChronoQuest");
 }
 
 void UMultiplayerSessionsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -45,6 +46,7 @@ void UMultiplayerSessionsSubsystem::Initialize(FSubsystemCollectionBase& Collect
 			sessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &ThisClass::OnCreateSessionComplete);
 			sessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &ThisClass::OnDestroySessionComplete);
 			sessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &ThisClass::OnFindSessionsComplete);
+			sessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &ThisClass::OnJoinSessionComplete);
 		}
 	}
 }
@@ -70,7 +72,6 @@ void UMultiplayerSessionsSubsystem::CreateServer(const FString& serverName)
 	 *
 	 */
 
-	FName mySessionName = FName("Co-op ChronoQuest");
 	FOnlineSessionSettings sessionSettings;
 
 	//check if session already exists
@@ -148,6 +149,7 @@ void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasuccessful)
 	}
 
 	TArray<FOnlineSessionSearchResult> results = sessionSearch->SearchResults;
+	FOnlineSessionSearchResult* correctResult = nullptr;
 	if(results.Num() > 0)
 	{
 		FString msg = FString::Printf(TEXT("Sessions found: %d"), results.Num());
@@ -160,11 +162,53 @@ void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasuccessful)
 				FString serverName = "none";
 				result.Session.SessionSettings.Get(FName("SERVER_NAME"), serverName);
 
-				PrintString(FString::Printf(TEXT("SERVER NAME: %s"), *serverName));
+				if(serverName.Equals(serverNameToFind))
+				{
+					correctResult = &result;
+					PrintString(FString::Printf(TEXT("SERVER NAME: %s"), *serverName));
+					break;
+				}
 			}
+		}
+
+		if(correctResult)
+		{
+			sessionInterface->JoinSession(0, mySessionName, *correctResult);
+
+		}else
+		{
+			PrintString("...Nope no server....");
 		}
 
 		return;
 	}
 	PrintString("Nope no sessions");
+}
+
+void UMultiplayerSessionsSubsystem::OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result)
+{
+
+	if(result == EOnJoinSessionCompleteResult::Success)
+	{
+		PrintString("you got it");
+		FString ipAddress;
+		if(sessionInterface->GetResolvedConnectString(mySessionName, ipAddress))
+		{
+			PrintString(ipAddress);
+			APlayerController* pc = GetGameInstance()->GetFirstLocalPlayerController();
+
+			if(pc)
+			{
+				pc->ClientTravel(ipAddress, TRAVEL_Absolute);
+			}
+
+		}else
+		{
+			PrintString("Did not get the ip address...");
+		}
+
+	}else
+	{
+		PrintString(TEXT("Fail to join..."));
+	}
 }

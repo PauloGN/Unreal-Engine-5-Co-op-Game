@@ -32,6 +32,7 @@ public:
 	bool bIsLanConnection = false;
 
 	//Session and server Settings
+	FName mySessionName;
 	FString lastServerName;
 	FString serverNameToFind;
 	bool bCreateServerOnDestroy;
@@ -41,4 +42,5 @@ public:
 	void OnCreateSessionComplete(FName SessionName, bool bWasuccessful);
 	void OnDestroySessionComplete(FName SessionName, bool bWasuccessful);
 	void OnFindSessionsComplete(bool bWasuccessful);
+	void OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result);
 };
