@@ -8,6 +8,10 @@
 #include "OnlineSessionSettings.h"
 #include "MultiplayerSessionsSubsystem.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FServerCreateDelegate, bool, bWasSuccessful);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FServerJoinDelegate, bool, bWasSuccessful);
+
 /**
  * 
  */
@@ -43,4 +47,9 @@ public:
 	void OnDestroySessionComplete(FName SessionName, bool bWasuccessful);
 	void OnFindSessionsComplete(bool bWasuccessful);
 	void OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result);
+	//Custom delegates
+	UPROPERTY(BlueprintAssignable)
+	FServerCreateDelegate serverCreateDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FServerJoinDelegate serverJoinDelegate;
 };

@@ -63,6 +63,7 @@ void UMultiplayerSessionsSubsystem::CreateServer(const FString& serverName)
 	if(serverName.IsEmpty())
 	{
 		PrintString(TEXT("Server Name can not be empty: ") + serverName);
+		serverCreateDelegate.Broadcast(false);
 		return;
 	}
 
@@ -102,6 +103,7 @@ void UMultiplayerSessionsSubsystem::FindServer(const FString& serverName)
 {
 	if (serverName.IsEmpty())
 	{
+		serverJoinDelegate.Broadcast(false);
 		PrintString(TEXT("Server Name can not be empty: ") + serverName);
 		return;
 	}
@@ -121,6 +123,7 @@ void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, b
 {
 	PrintString(FString::Printf(TEXT("Resul: %d"), bWasuccessful));
 
+	serverCreateDelegate.Broadcast(bWasuccessful);
 	if(bWasuccessful)
 	{
 		GetWorld()->ServerTravel("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");
@@ -140,11 +143,13 @@ void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasuccessful)
 {
 	if(!bWasuccessful)
 	{
+		serverJoinDelegate.Broadcast(false);
 		return;
 	}
 
 	if(serverNameToFind.IsEmpty())
 	{
+		serverJoinDelegate.Broadcast(false);
 		return;
 	}
 
@@ -177,11 +182,13 @@ void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasuccessful)
 
 		}else
 		{
+			serverJoinDelegate.Broadcast(false);
 			PrintString("...Nope no server....");
 		}
 
 		return;
 	}
+	serverJoinDelegate.Broadcast(false);
 	PrintString("Nope no sessions");
 }
 
@@ -204,11 +211,13 @@ void UMultiplayerSessionsSubsystem::OnJoinSessionComplete(FName sessionName, EOn
 
 		}else
 		{
+			serverJoinDelegate.Broadcast(false);
 			PrintString("Did not get the ip address...");
 		}
 
 	}else
 	{
+		serverJoinDelegate.Broadcast(false);
 		PrintString(TEXT("Fail to join..."));
 	}
 }
