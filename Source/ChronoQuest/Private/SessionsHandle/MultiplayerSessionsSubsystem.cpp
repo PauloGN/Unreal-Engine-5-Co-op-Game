@@ -30,6 +30,9 @@ void UMultiplayerSessionsSubsystem::Initialize(FSubsystemCollectionBase& Collect
 
 	IOnlineSubsystem* onlineSubsystem = IOnlineSubsystem::Get();
 
+	gameMapsName.Add("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");
+	gameMapsName.Add("/Game/ThirdPerson/Maps/Chapter01?listen");
+
 	if(onlineSubsystem)
 	{
 		// it could be any online subsystem service out there (NULL, steam, facebook, google play, etc.)
@@ -119,6 +122,17 @@ void UMultiplayerSessionsSubsystem::FindServer(const FString& serverName)
 	sessionInterface->FindSessions(0, sessionSearch.ToSharedRef());
 }
 
+void UMultiplayerSessionsSubsystem::SetMapIndex(const int index)
+{
+
+	if(index < 0 || index > gameMapsName.Num())
+	{
+		mapIndex = 0;
+		return;
+	}
+	mapIndex = index;
+}
+
 void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasuccessful)
 {
 	PrintString(FString::Printf(TEXT("Resul: %d"), bWasuccessful));
@@ -126,7 +140,7 @@ void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, b
 	serverCreateDelegate.Broadcast(bWasuccessful);
 	if(bWasuccessful)
 	{
-		GetWorld()->ServerTravel("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");
+		GetWorld()->ServerTravel(*gameMapsName[mapIndex]);
 	}
 }
 
@@ -194,7 +208,6 @@ void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasuccessful)
 
 void UMultiplayerSessionsSubsystem::OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result)
 {
-
 	if(result == EOnJoinSessionCompleteResult::Success)
 	{
 		PrintString("you got it");

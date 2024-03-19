@@ -13,6 +13,7 @@
 #include "Net/UnrealNetwork.h"
 #include <Engine/StaticMeshActor.h>
 
+#include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -56,6 +57,9 @@ AChronoQuestCharacter::AChronoQuestCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	overHeadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PlayerName"));
+	overHeadWidget->SetupAttachment(RootComponent);
 }
 
 void AChronoQuestCharacter::BeginPlay()

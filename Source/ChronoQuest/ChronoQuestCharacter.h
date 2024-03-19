@@ -98,5 +98,10 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMesh* sphereMesh;
+
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UWidgetComponent* overHeadWidget = nullptr;
+
 };
 

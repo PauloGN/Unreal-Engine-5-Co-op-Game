@@ -42,6 +42,9 @@ public:
 	bool bCreateServerOnDestroy;
 	TSharedPtr<FOnlineSessionSearch> sessionSearch;
 
+	UFUNCTION(BlueprintCallable)
+	void SetMapIndex(const int index);
+
 	//Delegate calls
 	void OnCreateSessionComplete(FName SessionName, bool bWasuccessful);
 	void OnDestroySessionComplete(FName SessionName, bool bWasuccessful);
@@ -52,4 +55,12 @@ public:
 	FServerCreateDelegate serverCreateDelegate;
 	UPROPERTY(BlueprintAssignable)
 	FServerJoinDelegate serverJoinDelegate;
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FString> gameMapsName;
+
+private:
+
+	int mapIndex = 0;
+
 };
