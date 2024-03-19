@@ -12,8 +12,11 @@ class AChronoQuestGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-
+	
 	AChronoQuestGameMode();
+
+	UFUNCTION(BlueprintCallable)
+	void GoToNextLevel(const FString mapFullPath);
 
 	UFUNCTION(BlueprintCallable)
 	void HostLanGame();

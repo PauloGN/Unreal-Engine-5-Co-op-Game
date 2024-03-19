@@ -4,6 +4,8 @@
 #include "OnlineSubsystem.h"
 #include <Online/OnlineSessionNames.h>
 
+#include "ChronoQuest/ChronoQuestGameMode.h"
+
 namespace 
 {
 	void PrintString(const FString& text)
@@ -131,6 +133,11 @@ void UMultiplayerSessionsSubsystem::SetMapIndex(const int index)
 		return;
 	}
 	mapIndex = index;
+}
+
+int UMultiplayerSessionsSubsystem::GetMapIndex()
+{
+	return mapIndex;
 }
 
 void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasuccessful)

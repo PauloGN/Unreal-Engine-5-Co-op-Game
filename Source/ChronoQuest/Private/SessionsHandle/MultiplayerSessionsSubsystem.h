@@ -45,6 +45,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetMapIndex(const int index);
 
+	UFUNCTION(BlueprintCallable)
+	int GetMapIndex();
+
 	//Delegate calls
 	void OnCreateSessionComplete(FName SessionName, bool bWasuccessful);
 	void OnDestroySessionComplete(FName SessionName, bool bWasuccessful);
