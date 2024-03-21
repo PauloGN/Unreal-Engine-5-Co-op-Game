@@ -6,6 +6,10 @@
 #include "GameFramework/Actor.h"
 #include "CPP_TriggerPlatform.generated.h"
 
+//Delegates
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTriggerActivated);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTriggerDeactivated);
+
 UCLASS()
 class ACPP_TriggerPlatform : public AActor
 {
@@ -36,4 +40,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	bool activated;
 
+	//Delegate variables
+	UPROPERTY(BlueprintAssignable)
+	FOnTriggerActivated OnTriggerActivated;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnTriggerDeactivated OnTriggerDeactivated;
 };

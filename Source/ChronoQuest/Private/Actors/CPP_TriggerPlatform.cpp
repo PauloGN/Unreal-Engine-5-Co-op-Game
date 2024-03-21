@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Actors/CPP_TriggerPlatform.h"
 
 // Sets default values
@@ -41,5 +40,42 @@ void ACPP_TriggerPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
+	if(HasAuthority())
+	{
+		TArray<AActor*> overlapingActors;
+		AActor* triggerActor = nullptr;
+		triggerMesh->GetOverlappingActors(overlapingActors);
 
+		for (int i = 0; i < overlapingActors.Num(); ++i)
+		{
+			AActor* actor = overlapingActors[i];
+			if(actor != nullptr && actor->ActorHasTag("TriggerActor"))
+			{
+				triggerActor = actor;
+				break;
+			}
+		}
+
+		//Check if we got a valid actor pointer
+
+		if(triggerActor)
+		{
+			if(!activated)
+			{
+				activated = true;
+				//Fire delegate
+				OnTriggerActivated.Broadcast();
+				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Bao"));
+			}
+		}else
+		{
+			if (activated)
+			{
+				activated = false;
+				//Fire delegate
+				OnTriggerDeactivated.Broadcast();
+				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Ruim"));
+			}
+		}
+	}
+}
