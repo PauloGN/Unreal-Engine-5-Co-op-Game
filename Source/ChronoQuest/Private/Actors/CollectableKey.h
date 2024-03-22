@@ -25,6 +25,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float RotationSpeed;
+
 	UPROPERTY(ReplicatedUsing = OnRep_bIscollected, BlueprintReadWrite, VisibleAnywhere)
 	bool bIscollected;
 
@@ -36,4 +39,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	class UCapsuleComponent* capsule;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UAudioComponent* collectedCue;
 };
