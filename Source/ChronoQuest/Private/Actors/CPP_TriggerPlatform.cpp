@@ -40,7 +40,6 @@ void ACPP_TriggerPlatform::BeginPlay()
 	//self move settings
 	FVector endPoint = GetActorLocation() + FVector(0.0f, 0.0f, -10.0f);
 	transporter->SetPoints(GetActorLocation(), endPoint);
-	transporter->triggerActors.Add(this);
 }
 
 // Called every frame
@@ -74,7 +73,6 @@ void ACPP_TriggerPlatform::Tick(float DeltaTime)
 				//Fire delegate
 				OnTriggerActivated.Broadcast();
 				//Self move activation
-				transporter->activateTriggerActorsCount++;
 				transporter->bAllTriggerActorsTriggered = true;
 				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Bao"));
 			}
@@ -86,7 +84,6 @@ void ACPP_TriggerPlatform::Tick(float DeltaTime)
 				//Fire delegate
 				OnTriggerDeactivated.Broadcast();
 				//self move activation
-				transporter->activateTriggerActorsCount--;
 				transporter->bAllTriggerActorsTriggered = false;
 				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Ruim"));
 			}
