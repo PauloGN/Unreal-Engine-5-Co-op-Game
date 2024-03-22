@@ -76,7 +76,6 @@ void UCPP_Transporter::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	AActor* owner = GetOwner();
 	if(owner && owner->HasAuthority() && bArePointsSet)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Yellow, FString::Printf(TEXT("AEWWWW %d"), activateTriggerActorsCount));
 		//moving actor
 		FVector currentLocation = owner->GetActorLocation();
 		const float speed = FVector::Distance(startPoint, endPoint) / moveTime;

@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Actors/CPP_TriggerPlatform.h"
+#include "CPP_Transporter.h"
 
 // Sets default values
 ACPP_TriggerPlatform::ACPP_TriggerPlatform()
@@ -21,6 +22,9 @@ ACPP_TriggerPlatform::ACPP_TriggerPlatform()
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	mesh->SetupAttachment(rootComp);
 	mesh->SetIsReplicated(true);
+	//self move settings
+	transporter = CreateDefaultSubobject<UCPP_Transporter>(TEXT("Transporter"));
+	transporter->moveTime = 0.15f;
 }
 
 // Called when the game starts or when spawned
@@ -33,6 +37,10 @@ void ACPP_TriggerPlatform::BeginPlay()
 
 	triggerMesh->SetVisibility(false);
 	triggerMesh->SetCollisionProfileName(FName("OverlapAll"));
+	//self move settings
+	FVector endPoint = GetActorLocation() + FVector(0.0f, 0.0f, -10.0f);
+	transporter->SetPoints(GetActorLocation(), endPoint);
+	transporter->triggerActors.Add(this);
 }
 
 // Called every frame
@@ -65,6 +73,9 @@ void ACPP_TriggerPlatform::Tick(float DeltaTime)
 				activated = true;
 				//Fire delegate
 				OnTriggerActivated.Broadcast();
+				//Self move activation
+				transporter->activateTriggerActorsCount++;
+				transporter->bAllTriggerActorsTriggered = true;
 				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Bao"));
 			}
 		}else
@@ -74,6 +85,9 @@ void ACPP_TriggerPlatform::Tick(float DeltaTime)
 				activated = false;
 				//Fire delegate
 				OnTriggerDeactivated.Broadcast();
+				//self move activation
+				transporter->activateTriggerActorsCount--;
+				transporter->bAllTriggerActorsTriggered = false;
 				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Ruim"));
 			}
 		}

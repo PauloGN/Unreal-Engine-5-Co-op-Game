@@ -37,7 +37,7 @@ public:
 	//How long it takes to move the owning actor from one point to another
 	UPROPERTY(EditAnywhere)
 	float moveTime;
-
+	
 	//Triggers responsible to activate this component functionality
 	UPROPERTY(EditAnywhere)
 	TArray<AActor*> triggerActors;

@@ -4,20 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "CPP_TriggerPlatform.generated.h"
-
-//Delegates
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTriggerActivated);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTriggerDeactivated);
+#include "Actors/CPP_Transporter.h"
+#include <Components/ArrowComponent.h>
+#include "MovableActor.generated.h"
 
 UCLASS()
-class ACPP_TriggerPlatform : public AActor
+class AMovableActor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ACPP_TriggerPlatform();
+	AMovableActor();
 
 protected:
 	// Called when the game starts or when spawned
@@ -27,26 +25,18 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	//Default variables
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	USceneComponent* rootComp;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	UStaticMeshComponent* triggerMesh;
+	UArrowComponent* Point1;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UArrowComponent* Point2;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	UStaticMeshComponent* mesh;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	bool activated;
-
-	//Delegate variables
-	UPROPERTY(BlueprintAssignable)
-	FOnTriggerActivated OnTriggerActivated;
-
-	UPROPERTY(BlueprintAssignable)
-	FOnTriggerDeactivated OnTriggerDeactivated;
-	//self move settings
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	class UCPP_Transporter* transporter;
+	UCPP_Transporter* transportComponent;
 };
