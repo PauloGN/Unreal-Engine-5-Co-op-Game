@@ -29,8 +29,8 @@ ACollectableKeyHolder::ACollectableKeyHolder()
 
 void ACollectableKeyHolder::ActivateKeyMesh()
 {
-	keyMesh->SetVisibility(true);
 	bIsKeyCollected = true;
+	keyMesh->SetVisibility(true);
 }
 
 // Called when the game starts or when spawned
@@ -48,6 +48,6 @@ void ACollectableKeyHolder::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (!bIsKeyCollected) return;
-	keyMesh->SetRelativeRotation(FRotator(0.0f, KeyRotationSpeed * DeltaTime, 0.0f));
+	keyMesh->AddRelativeRotation(FRotator(0.0f, KeyRotationSpeed * DeltaTime, 0.0f));
 }
 

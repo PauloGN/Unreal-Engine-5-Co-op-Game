@@ -67,12 +67,6 @@ void AChronoQuestCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
-
-	if(HasAuthority())
-	{
-		GetWorld()->GetTimerManager().SetTimer(testTimer, this, &ThisClass::MulticastRPCExplode, 2.0f, false);
-	}
-
 	//Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
@@ -83,74 +77,77 @@ void AChronoQuestCharacter::BeginPlay()
 	}
 }
 
-void AChronoQuestCharacter::SpawnSphere()
-{
-	if(HasAuthority())
-	{
-		if(sphereMesh == nullptr)
-		{
-			return;
-		}
-		//Ownership
-		FActorSpawnParameters SpawnParameters;
-		SpawnParameters.Owner = this;
-		//Creates and sets actor settings
-		if(AStaticMeshActor* staticMeshActor = GetWorld()->SpawnActor<AStaticMeshActor>(SpawnParameters))
-		{
-			//staticMeshActor->SetOwner();
-			staticMeshActor->SetReplicates(true);
-			staticMeshActor->SetReplicateMovement(true);
-			staticMeshActor->SetMobility(EComponentMobility::Movable);
+#pragma region RPC
 
-			const FVector forwardingVector = GetActorLocation() + GetActorRotation().Vector() * 100.0f;
-			const FVector UpwardingdingVector = GetActorUpVector() * 50.0f;
-			const FVector spawnLocation = forwardingVector + UpwardingdingVector;
+//void AChronoQuestCharacter::SpawnSphere()
+//{
+//	if(HasAuthority())
+//	{
+//		if(sphereMesh == nullptr)
+//		{
+//			return;
+//		}
+//		//Ownership
+//		FActorSpawnParameters SpawnParameters;
+//		SpawnParameters.Owner = this;
+//		//Creates and sets actor settings
+//		if(AStaticMeshActor* staticMeshActor = GetWorld()->SpawnActor<AStaticMeshActor>(SpawnParameters))
+//		{
+//			//staticMeshActor->SetOwner();
+//			staticMeshActor->SetReplicates(true);
+//			staticMeshActor->SetReplicateMovement(true);
+//			staticMeshActor->SetMobility(EComponentMobility::Movable);
+//
+//			const FVector forwardingVector = GetActorLocation() + GetActorRotation().Vector() * 100.0f;
+//			const FVector UpwardingdingVector = GetActorUpVector() * 50.0f;
+//			const FVector spawnLocation = forwardingVector + UpwardingdingVector;
+//
+//			staticMeshActor->SetActorLocation(spawnLocation);
+//			//Setting up component
+//			UStaticMeshComponent* meshComponentFromActor = staticMeshActor->GetStaticMeshComponent();
+//			if(meshComponentFromActor)
+//			{
+//				meshComponentFromActor->SetIsReplicated(true);
+//				meshComponentFromActor->SetSimulatePhysics(true);
+//				if(sphereMesh != nullptr)
+//				{
+//					meshComponentFromActor->SetStaticMesh(sphereMesh);
+//				}
+//			}
+//		}
+//	}
+//}
+//
+//void AChronoQuestCharacter::ClientRPCCall_Implementation()
+//{
+//	if(!IsRunningDedicatedServer() && SmokeEffect != nullptr)
+//	{
+//		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SmokeEffect, GetActorLocation(), FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
+//	}
+//}
+//
+//void AChronoQuestCharacter::MulticastRPCExplode_Implementation()
+//{
+//	if (!IsRunningDedicatedServer() && explosionEffect != nullptr)
+//	{
+//		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), explosionEffect, GetActorLocation(), FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
+//		GetWorld()->GetTimerManager().SetTimer(testTimer, this, &ThisClass::MulticastRPCExplode, 2.0f, false);
+//	}
+//}
+//
+////Server RPC should be only executed on the server
+////Validation are executed before the implementation if it fails the implementation will not be executed, and the client who called the failed one will be disconnected from the game
+//bool AChronoQuestCharacter::ServerRPCFunction_Validate(const int num)
+//{
+//	return (num < 100 && num >= 0);
+//}
+//void AChronoQuestCharacter::ServerRPCFunction_Implementation(const int num)
+//{
+//	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("Server RPC, %d"), num));
+//	SpawnSphere();
+//}
 
-			staticMeshActor->SetActorLocation(spawnLocation);
-			//Setting up component
-			UStaticMeshComponent* meshComponentFromActor = staticMeshActor->GetStaticMeshComponent();
-			if(meshComponentFromActor)
-			{
-				meshComponentFromActor->SetIsReplicated(true);
-				meshComponentFromActor->SetSimulatePhysics(true);
-				if(sphereMesh != nullptr)
-				{
-					meshComponentFromActor->SetStaticMesh(sphereMesh);
-				}
-			}
-		}
-	}
-}
-
-void AChronoQuestCharacter::ClientRPCCall_Implementation()
-{
-	if(!IsRunningDedicatedServer() && SmokeEffect != nullptr)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SmokeEffect, GetActorLocation(), FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
-	}
-}
-
-void AChronoQuestCharacter::MulticastRPCExplode_Implementation()
-{
-	if (!IsRunningDedicatedServer() && explosionEffect != nullptr)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), explosionEffect, GetActorLocation(), FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
-		GetWorld()->GetTimerManager().SetTimer(testTimer, this, &ThisClass::MulticastRPCExplode, 2.0f, false);
-	}
-}
-
-//Server RPC should be only executed on the server
-//Validation are executed before the implementation if it fails the implementation will not be executed, and the client who called the failed one will be disconnected from the game
-bool AChronoQuestCharacter::ServerRPCFunction_Validate(const int num)
-{
-	return (num < 100 && num >= 0);
-}
-void AChronoQuestCharacter::ServerRPCFunction_Implementation(const int num)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("Server RPC, %d"), num));
-	SpawnSphere();
-}
-
+#pragma endregion
 
 //////////////////////////////////////////////////////////////////////////
 // Input

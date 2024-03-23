@@ -3,6 +3,7 @@
 #include "Actors/CollectableKey.h"
 #include <Components/CapsuleComponent.h>
 
+#include "CollectableKeyHolder.h"
 #include "ChronoQuest/ChronoQuestCharacter.h"
 #include "Components/AudioComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -81,5 +82,10 @@ void ACollectableKey::OnRep_bIscollected()
 {
 	collectedCue->Play();
 	mesh->SetVisibility(false);
+
+	if(keyHolder && bIscollected)
+	{
+		keyHolder->ActivateKeyMesh();
+	}
 	//Destroy();
 }

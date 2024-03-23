@@ -64,40 +64,43 @@ protected:
 	// To add mapping context
 	virtual void BeginPlay();
 
-	UFUNCTION(BlueprintCallable)
-	void SpawnSphere();
-
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-	/**
-	 * \RPC - Remote Procedure Calls And Static Mesh
-	 */
+#pragma region RPC
 
-	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
-	void ServerRPCFunction(const int num);
+	//UFUNCTION(BlueprintCallable)
+	//void SpawnSphere();
+	///**
+	// * \RPC - Remote Procedure Calls And Static Mesh
+	// */
 
-	//Client RPC
-	UFUNCTION(Client, Reliable, BlueprintCallable)
-	void ClientRPCCall();
+	//UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
+	//void ServerRPCFunction(const int num);
 
-	//Multicast RPC
-	FTimerHandle testTimer;
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void MulticastRPCExplode();
+	////Client RPC
+	//UFUNCTION(Client, Reliable, BlueprintCallable)
+	//void ClientRPCCall();
 
-	//Holder for assets
-	UPROPERTY(EditAnywhere)
-	UParticleSystem* explosionEffect;
+	////Multicast RPC
+	//FTimerHandle testTimer;
+	//UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	//void MulticastRPCExplode();
 
-	UPROPERTY(EditAnywhere)
-	UParticleSystem* SmokeEffect;
+	////Holder for assets
+	//UPROPERTY(EditAnywhere)
+	//UParticleSystem* explosionEffect;
 
-	UPROPERTY(EditAnywhere)
-	UStaticMesh* sphereMesh;
+	//UPROPERTY(EditAnywhere)
+	//UParticleSystem* SmokeEffect;
+
+	//UPROPERTY(EditAnywhere)
+	//UStaticMesh* sphereMesh;
+
+#pragma endregion
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

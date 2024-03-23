@@ -28,6 +28,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float RotationSpeed;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class ACollectableKeyHolder* keyHolder;
+
 	UPROPERTY(ReplicatedUsing = OnRep_bIscollected, BlueprintReadWrite, VisibleAnywhere)
 	bool bIscollected;
 
