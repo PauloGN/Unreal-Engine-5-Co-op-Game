@@ -80,6 +80,15 @@ void ACollectableKey::Tick(float DeltaTime)
 //this is going to be automatically called from the client but not from server
 void ACollectableKey::OnRep_bIscollected()
 {
+
+	if(HasAuthority())
+	{
+		if(bIscollected)
+		{
+			OnCollected.Broadcast();
+		}
+	}
+
 	collectedCue->Play();
 	mesh->SetVisibility(false);
 

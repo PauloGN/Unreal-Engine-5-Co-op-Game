@@ -3,6 +3,7 @@
 
 #include "Actors/CPP_Transporter.h"
 #include "CPP_TriggerPlatform.h"
+#include "CollectableKey.h"
 
 UCPP_Transporter::UCPP_Transporter()
 {
@@ -64,9 +65,15 @@ void UCPP_Transporter::BeginPlay()
 		{
 			tp->OnTriggerActivated.AddDynamic(this, &ThisClass::OntriggerActivated);
 			tp->OnTriggerDeactivated.AddDynamic(this, &ThisClass::OntriggerDeactivated);
+			continue;
+		}
+
+		ACollectableKey* ck = Cast<ACollectableKey>(actor);
+		if(ck)
+		{
+			ck->OnCollected.AddDynamic(this, &ThisClass::OntriggerActivated);
 		}
 	}
-	
 }
 
 void UCPP_Transporter::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

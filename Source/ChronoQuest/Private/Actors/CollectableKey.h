@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "CollectableKey.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCollectableKeyOnCollected);
+
 UCLASS()
 class ACollectableKey : public AActor
 {
@@ -14,8 +16,9 @@ class ACollectableKey : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ACollectableKey();
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -45,4 +48,6 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	class UAudioComponent* collectedCue;
+
+	FCollectableKeyOnCollected OnCollected;
 };
