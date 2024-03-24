@@ -24,6 +24,7 @@ UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem()
 	lastServerName = "";
 	serverNameToFind = "";
 	mySessionName = FName("Co-op ChronoQuest");
+
 }
 
 void UMultiplayerSessionsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -34,6 +35,7 @@ void UMultiplayerSessionsSubsystem::Initialize(FSubsystemCollectionBase& Collect
 
 	gameMapsName.Add("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");
 	gameMapsName.Add("/Game/ThirdPerson/Maps/Chapter01?listen");
+	gameMapsName.Add("/Game/ThirdPerson/Maps/Lobby?listen");
 
 	if(onlineSubsystem)
 	{
@@ -239,5 +241,17 @@ void UMultiplayerSessionsSubsystem::OnJoinSessionComplete(FName sessionName, EOn
 	{
 		serverJoinDelegate.Broadcast(false);
 		PrintString(TEXT("Fail to join..."));
+	}
+}
+
+void UMultiplayerSessionsSubsystem::GoToNextLevel(const int index)
+{
+	SetMapIndex(index);
+
+	UWorld* world = GetWorld();
+	if (world)
+	{
+		world->GetAuthGameMode()->bUseSeamlessTravel = true;
+		world->ServerTravel(*gameMapsName[mapIndex]);
 	}
 }

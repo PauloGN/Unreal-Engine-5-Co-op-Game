@@ -17,6 +17,7 @@ AWinBox::AWinBox()
 	SetRootComponent(boxComponet);
 
 	bHasFinished = false;
+
 }
 
 // Called when the game starts or when spawned

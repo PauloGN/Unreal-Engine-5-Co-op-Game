@@ -8,7 +8,6 @@
 #include "OnlineSessionSettings.h"
 #include "MultiplayerSessionsSubsystem.generated.h"
 
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FServerCreateDelegate, bool, bWasSuccessful);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FServerJoinDelegate, bool, bWasSuccessful);
 
@@ -61,6 +60,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<FString> gameMapsName;
+
+	UFUNCTION(BlueprintCallable)
+	void GoToNextLevel(const int index);
 
 private:
 
