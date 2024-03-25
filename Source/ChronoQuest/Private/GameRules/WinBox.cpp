@@ -42,9 +42,15 @@ void AWinBox::Tick(float DeltaTime)
 
 			if(bHasFinished)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 25, FColor::Emerald, "WINNER...");
+				UE_LOG(LogTemp, Display, TEXT("WinBox say: WINNER..."));
+				MulticastRPCWin();
 			}
 		}
 	}
 }
 
+//RPCs
+void AWinBox::MulticastRPCWin_Implementation()
+{
+	OnWinCondition.Broadcast();
+}
