@@ -31,6 +31,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FindServer(const FString& serverName);
 
+	UFUNCTION(BlueprintCallable)
+	void DestroyLastServer();
+
 	IOnlineSessionPtr sessionInterface;
 	bool bIsLanConnection = false;
 
@@ -52,6 +55,12 @@ public:
 	void OnDestroySessionComplete(FName SessionName, bool bWasuccessful);
 	void OnFindSessionsComplete(bool bWasuccessful);
 	void OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result);
+	// Delegate function called when the session disconnection is complete
+	void OnEndSessionComplete(FName SessionName, bool bWasSuccessful);
+	// Disconnects a client from the specified session
+	UFUNCTION(BlueprintCallable)
+	void DisconnectFromSession(const FName& SessionName);
+
 	//Custom delegates
 	UPROPERTY(BlueprintAssignable)
 	FServerCreateDelegate serverCreateDelegate;
@@ -67,5 +76,10 @@ public:
 private:
 
 	int mapIndex = 0;
+
+	// Delegate handle for the end session completion
+	FDelegateHandle OnEndSessionCompleteDelegateHandle;
+
+	bool bAlreadyStartedAsessionBefore;
 
 };

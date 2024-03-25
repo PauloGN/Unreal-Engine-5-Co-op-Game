@@ -24,7 +24,7 @@ UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem()
 	lastServerName = "";
 	serverNameToFind = "";
 	mySessionName = FName("Co-op ChronoQuest");
-
+	bAlreadyStartedAsessionBefore = false;
 }
 
 void UMultiplayerSessionsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -95,7 +95,7 @@ void UMultiplayerSessionsSubsystem::CreateServer(const FString& serverName)
 	sessionSettings.bAllowJoinInProgress = true;
 	sessionSettings.bIsDedicated = false;
 	sessionSettings.bShouldAdvertise = true;
-	sessionSettings.NumPublicConnections = 3;
+	sessionSettings.NumPublicConnections = 3;//********************************** THREE CONNECTIONS
 	sessionSettings.bUseLobbiesIfAvailable = true;
 	sessionSettings.bUsesPresence = true;
 	sessionSettings.bAllowJoinViaPresence = true;
@@ -115,6 +115,12 @@ void UMultiplayerSessionsSubsystem::FindServer(const FString& serverName)
 		return;
 	}
 
+	if (bAlreadyStartedAsessionBefore)
+	{
+		DestroyLastServer();
+		bAlreadyStartedAsessionBefore = false;
+	}
+
 	sessionSearch = MakeShareable(new FOnlineSessionSearch);
 	//how do we want the search to be done
 	sessionSearch->bIsLanQuery = bIsLanConnection;
@@ -124,6 +130,17 @@ void UMultiplayerSessionsSubsystem::FindServer(const FString& serverName)
 	serverNameToFind = serverName;
 
 	sessionInterface->FindSessions(0, sessionSearch.ToSharedRef());
+}
+
+void UMultiplayerSessionsSubsystem::DestroyLastServer()
+{
+	//check if session already exists
+	FNamedOnlineSession* existingSession = sessionInterface->GetNamedSession(mySessionName);
+	if (existingSession)
+	{
+		bCreateServerOnDestroy = false;
+		sessionInterface->DestroySession(mySessionName);
+	}
 }
 
 void UMultiplayerSessionsSubsystem::SetMapIndex(const int index)
@@ -228,6 +245,7 @@ void UMultiplayerSessionsSubsystem::OnJoinSessionComplete(FName sessionName, EOn
 
 			if(pc)
 			{
+				bAlreadyStartedAsessionBefore = true;
 				pc->ClientTravel(ipAddress, TRAVEL_Absolute);
 			}
 
@@ -241,6 +259,58 @@ void UMultiplayerSessionsSubsystem::OnJoinSessionComplete(FName sessionName, EOn
 	{
 		serverJoinDelegate.Broadcast(false);
 		PrintString(TEXT("Fail to join..."));
+	}
+}
+
+void UMultiplayerSessionsSubsystem::OnEndSessionComplete(FName SessionName, bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+		// Session ended successfully
+		UE_LOG(LogTemp, Warning, TEXT("Session '%s' ended successfully."), *SessionName.ToString());
+	}
+	else
+	{
+		// Failed to end session
+		UE_LOG(LogTemp, Warning, TEXT("Failed to end session '%s'."), *SessionName.ToString());
+	}
+
+	// Remove the delegate binding
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
+	if (OnlineSubsystem)
+	{
+		IOnlineSessionPtr SessionInterface = OnlineSubsystem->GetSessionInterface();
+		if (SessionInterface.IsValid())
+		{
+			SessionInterface->ClearOnEndSessionCompleteDelegate_Handle(OnEndSessionCompleteDelegateHandle);
+		}
+	}
+}
+
+void UMultiplayerSessionsSubsystem::DisconnectFromSession(const FName& SessionName)
+{
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
+	if (OnlineSubsystem)
+	{
+		IOnlineSessionPtr SessionInterface = OnlineSubsystem->GetSessionInterface();
+		if (SessionInterface.IsValid())
+		{
+			// Bind the delegate function
+			OnEndSessionCompleteDelegateHandle = SessionInterface->AddOnEndSessionCompleteDelegate_Handle(FOnEndSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnEndSessionComplete));
+
+			// Start the session ending process
+			SessionInterface->EndSession(SessionName);
+		}
+		else
+		{
+			// Session interface not valid
+			UE_LOG(LogTemp, Error, TEXT("Session interface is not valid."));
+		}
+	}
+	else
+	{
+		// Online subsystem not available
+		UE_LOG(LogTemp, Error, TEXT("Online subsystem is not available."));
 	}
 }
 
