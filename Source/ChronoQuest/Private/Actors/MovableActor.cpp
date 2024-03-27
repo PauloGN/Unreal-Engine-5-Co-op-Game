@@ -33,10 +33,14 @@ void AMovableActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	const FVector start = Point1->GetRelativeLocation() + GetActorLocation();
-	const FVector end = Point2->GetRelativeLocation() + GetActorLocation();
+	// Get the actor's transform
+	const FTransform ActorTransform = GetActorTransform();
 
-	transportComponent->SetPoints(start, end);
+	// Transform the relative locations of the points to world space
+	const FVector Start = ActorTransform.TransformPosition(Point1->GetRelativeLocation());
+	const FVector End = ActorTransform.TransformPosition(Point2->GetRelativeLocation());
+
+	transportComponent->SetPoints(Start, End);
 }
 
 void AMovableActor::Tick(float DeltaTime)

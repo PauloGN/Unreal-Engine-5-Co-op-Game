@@ -45,7 +45,6 @@ void ACollectableKey::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 void ACollectableKey::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ACollectableKey::Tick(float DeltaTime)

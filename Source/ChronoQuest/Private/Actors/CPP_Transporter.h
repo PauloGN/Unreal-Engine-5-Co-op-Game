@@ -49,4 +49,7 @@ public:
 	//True once all associated triggers are activated
 	UPROPERTY(BlueprintReadWrite ,VisibleAnywhere)
 	bool bAllTriggerActorsTriggered;
+
+	UPROPERTY(BlueprintReadWrite, EditInstanceOnly)
+	bool bMoveWithOneTrigger;
 };
