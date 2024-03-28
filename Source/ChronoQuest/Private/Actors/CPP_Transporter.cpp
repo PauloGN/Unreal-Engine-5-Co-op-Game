@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Actors/CPP_Transporter.h"
 #include "CPP_TriggerPlatform.h"
 #include "CollectableKey.h"

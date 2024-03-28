@@ -59,7 +59,7 @@ public:
 	UFUNCTION()
 	void OnRep_bIsFireOn();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Server,Reliable ,BlueprintCallable)
 	void LightFire();
 
 	FOnfireIsLight OnFireLights;

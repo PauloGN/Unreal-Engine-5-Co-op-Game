@@ -70,20 +70,15 @@ void ATheFireKey::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
-void ATheFireKey::LightFire()
-{
-	if(!bIsFireOn && !fire->GetVisibleFlag())
-	{
-		bIsFireOn = true;
-		OnRep_bIsFireOn();
-
-		if (HasAuthority() )
-		{
-			//OnRep_bIsFireOn();
-		}
-	}
-}
+//
+//void ATheFireKey::LightFire_Inplemented()
+//{
+//	if(!bIsFireOn && !fire->GetVisibleFlag())
+//	{
+//		bIsFireOn = true;
+//		OnRep_bIsFireOn();
+//	}
+//}
 
 void ATheFireKey::OnRep_bIsFireOn()
 {
@@ -95,8 +90,19 @@ void ATheFireKey::OnRep_bIsFireOn()
 			//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, "Server calling fire trigger");
 		}
 	}
+
 	fire->SetVisibility(true);
 	ambientLight->SetVisibility(true);
 	shadowedLight->SetVisibility(true);
 	smoke->AddRelativeLocation(FVector(0.0f, 0.0f, -10.f));
+
+}
+
+void ATheFireKey::LightFire_Implementation()
+{
+	if(!bIsFireOn && !fire->GetVisibleFlag())
+	{
+		bIsFireOn = true;
+		OnRep_bIsFireOn();
+	}
 }
