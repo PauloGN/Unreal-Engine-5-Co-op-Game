@@ -92,7 +92,7 @@ void ATheFireKey::OnRep_bIsFireOn()
 		if (bIsFireOn)
 		{
 			OnFireLights.Broadcast();
-			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, "Server calling fire trigger");
+			//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, "Server calling fire trigger");
 		}
 	}
 	fire->SetVisibility(true);

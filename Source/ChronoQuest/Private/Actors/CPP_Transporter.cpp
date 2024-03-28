@@ -46,7 +46,7 @@ void UCPP_Transporter::OntriggerActivated()
 	if(activateTriggerActorsCount >= triggerActors.Num())
 	{
 		bAllTriggerActorsTriggered = true;
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Black, FString::Printf(TEXT("AEWWWW %d"), activateTriggerActorsCount));
+		//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Black, FString::Printf(TEXT("AEWWWW %d"), activateTriggerActorsCount));
 	}
 }
 
@@ -58,7 +58,7 @@ void UCPP_Transporter::OntriggerDeactivated()
 	if (activateTriggerActorsCount < numOfNeededTriggers)
 	{
 		bAllTriggerActorsTriggered = false;
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::Printf(TEXT("AEWWWW %d"), activateTriggerActorsCount));
+		//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::Printf(TEXT("AEWWWW %d"), activateTriggerActorsCount));
 	}
 }
 

@@ -6,20 +6,10 @@
 
 #include "ChronoQuest/ChronoQuestGameMode.h"
 
-namespace 
-{
-	void PrintString(const FString& text)
-	{
-		if(GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Yellow, text);
-		}
-	}
-}
-
 UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem()
 {
-	PrintString(TEXT("Construction"));
+	//LOG
+	UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: Construction"));
 	bCreateServerOnDestroy = false;
 	lastServerName = "";
 	serverNameToFind = "";
@@ -41,7 +31,8 @@ void UMultiplayerSessionsSubsystem::Initialize(FSubsystemCollectionBase& Collect
 	{
 		// it could be any online subsystem service out there (NULL, steam, facebook, google play, etc.)
 		FString subsystemName = onlineSubsystem->GetSubsystemName().ToString();
-		PrintString(subsystemName);
+		//LOG
+		UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: Subsystem name = %s"), *subsystemName);
 
 		bIsLanConnection = subsystemName == FString("Steam") ? false : true;
 
@@ -69,7 +60,9 @@ void UMultiplayerSessionsSubsystem::CreateServer(const FString& serverName)
 {
 	if(serverName.IsEmpty())
 	{
-		PrintString(TEXT("Server Name can not be empty: ") + serverName);
+		//LOG
+		UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: Server name can not be empty"));
+
 		serverCreateDelegate.Broadcast(false);
 		return;
 	}
@@ -111,7 +104,8 @@ void UMultiplayerSessionsSubsystem::FindServer(const FString& serverName)
 	if (serverName.IsEmpty())
 	{
 		serverJoinDelegate.Broadcast(false);
-		PrintString(TEXT("Server Name can not be empty: ") + serverName);
+		//LOG
+		UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: Server name can not be empty"));
 		return;
 	}
 
@@ -161,7 +155,8 @@ int UMultiplayerSessionsSubsystem::GetMapIndex()
 
 void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasuccessful)
 {
-	PrintString(FString::Printf(TEXT("Resul: %d"), bWasuccessful));
+	//LOG
+	UE_LOG(LogTemp, Display, TEXT("Resul: %d"), bWasuccessful);
 
 	serverCreateDelegate.Broadcast(bWasuccessful);
 	if(bWasuccessful)
@@ -198,7 +193,8 @@ void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasuccessful)
 	if(results.Num() > 0)
 	{
 		FString msg = FString::Printf(TEXT("Sessions found: %d"), results.Num());
-		PrintString(msg);
+		//LOG
+		UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: %s"), *msg);
 
 		for (FOnlineSessionSearchResult& result : results)
 		{
@@ -210,7 +206,8 @@ void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasuccessful)
 				if(serverName.Equals(serverNameToFind))
 				{
 					correctResult = &result;
-					PrintString(FString::Printf(TEXT("SERVER NAME: %s"), *serverName));
+					//LOG
+					UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem Server name: %s"), *serverName);
 					break;
 				}
 			}
@@ -223,24 +220,28 @@ void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasuccessful)
 		}else
 		{
 			serverJoinDelegate.Broadcast(false);
-			PrintString("...Nope no server....");
+			//LOG
+			UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: Nope no server found"));
 		}
 
 		return;
 	}
 	serverJoinDelegate.Broadcast(false);
-	PrintString("Nope no sessions");
+	//LOG
+	UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: Nope no session"));
 }
 
 void UMultiplayerSessionsSubsystem::OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result)
 {
 	if(result == EOnJoinSessionCompleteResult::Success)
 	{
-		PrintString("you got it");
+		//LOG
+		UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: You've got a session"));
 		FString ipAddress;
 		if(sessionInterface->GetResolvedConnectString(mySessionName, ipAddress))
 		{
-			PrintString(ipAddress);
+			//LOG
+			UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem IP: %s"), *ipAddress);
 			APlayerController* pc = GetGameInstance()->GetFirstLocalPlayerController();
 
 			if(pc)
@@ -252,13 +253,15 @@ void UMultiplayerSessionsSubsystem::OnJoinSessionComplete(FName sessionName, EOn
 		}else
 		{
 			serverJoinDelegate.Broadcast(false);
-			PrintString("Did not get the ip address...");
+			//LOG
+			UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem IP: Failed"));
 		}
 
 	}else
 	{
 		serverJoinDelegate.Broadcast(false);
-		PrintString(TEXT("Fail to join..."));
+		//LOG
+		UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem : Failed to joind session"));
 	}
 }
 
