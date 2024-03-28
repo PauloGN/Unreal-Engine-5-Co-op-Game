@@ -9,7 +9,6 @@
 UCPP_Transporter::UCPP_Transporter()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
 	SetIsReplicatedByDefault(true);
 
 	moveTime = 3.0f;
@@ -66,6 +65,8 @@ void UCPP_Transporter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetIsReplicated(true);
+	
 	for (AActor* actor : triggerActors)
 	{
 		ACPP_TriggerPlatform* tp = Cast<ACPP_TriggerPlatform>(actor);

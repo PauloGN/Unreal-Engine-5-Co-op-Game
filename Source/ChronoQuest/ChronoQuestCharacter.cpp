@@ -62,6 +62,14 @@ AChronoQuestCharacter::AChronoQuestCharacter()
 	overHeadWidget->SetupAttachment(RootComponent);
 }
 
+void AChronoQuestCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AChronoQuestCharacter, bStartAction);
+
+}
+
 void AChronoQuestCharacter::BeginPlay()
 {
 	// Call the base class  

@@ -8,10 +8,10 @@ ACPP_TriggerPlatform::ACPP_TriggerPlatform()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	activated = false;
-
 	bReplicates = true;
     AActor::SetReplicateMovement(true);
+
+	activated = false;
 
 	rootComp = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
 	SetRootComponent(rootComp);

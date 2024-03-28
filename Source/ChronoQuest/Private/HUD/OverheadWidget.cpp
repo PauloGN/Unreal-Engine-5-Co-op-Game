@@ -2,6 +2,8 @@
 
 
 #include "HUD/OverheadWidget.h"
+
+#include "OnlineSubsystem.h"
 #include "Components/TextBlock.h"
 #include "GameFramework/PlayerState.h"
 
@@ -9,7 +11,37 @@ void UOverheadWidget::SetDisplayText(FString TextToDisplay)
 {
 	if (displayText)
 	{
-		displayText->SetText(FText::FromString(TextToDisplay));
+		FString playerName = TextToDisplay;
+		const IOnlineSubsystem* onlineSubsystem = IOnlineSubsystem::Get();
+		if (onlineSubsystem)
+		{
+			// it could be any online subsystem service out there (NULL, steam, facebook, google play, etc.)
+			const FString subsystemName = onlineSubsystem->GetSubsystemName().ToString();
+			const bool bIsLanConnection = subsystemName == FString("Steam") ? false : true;
+			if (bIsLanConnection)
+			{
+				const int textLength = TextToDisplay.Len();
+				playerName = "";
+
+				if(textLength >= 3)
+				{
+					for (int i = 0; i < 3; ++i)
+					{
+						playerName += TextToDisplay[i];
+					}
+					playerName += "-";
+					for (int i = 0; i < 2; ++i)
+					{
+						playerName += TextToDisplay[textLength - 1 - i];
+					}
+				}else
+				{
+					playerName += TextToDisplay[0];
+				}
+			}
+		}
+
+		displayText->SetText(FText::FromString(playerName));
 	}
 }
 
