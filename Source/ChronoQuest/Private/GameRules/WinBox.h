@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "WinBox.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FWinAreaOnWinCondition);
+
 UCLASS()
 class AWinBox : public AActor
 {
@@ -28,4 +30,12 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	class UBoxComponent* boxComponet;
+
+	//RPC
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPCWin();
+
+	UPROPERTY(BlueprintAssignable)
+	FWinAreaOnWinCondition OnWinCondition;
+
 };

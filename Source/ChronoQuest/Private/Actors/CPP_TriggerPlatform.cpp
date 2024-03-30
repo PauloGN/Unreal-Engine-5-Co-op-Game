@@ -8,10 +8,10 @@ ACPP_TriggerPlatform::ACPP_TriggerPlatform()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	activated = false;
-
 	bReplicates = true;
     AActor::SetReplicateMovement(true);
+
+	activated = false;
 
 	rootComp = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
 	SetRootComponent(rootComp);
@@ -74,7 +74,7 @@ void ACPP_TriggerPlatform::Tick(float DeltaTime)
 				OnTriggerActivated.Broadcast();
 				//Self move activation
 				transporter->bAllTriggerActorsTriggered = true;
-				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Bao"));
+				//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Bao"));
 			}
 		}else
 		{
@@ -85,7 +85,7 @@ void ACPP_TriggerPlatform::Tick(float DeltaTime)
 				OnTriggerDeactivated.Broadcast();
 				//self move activation
 				transporter->bAllTriggerActorsTriggered = false;
-				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Ruim"));
+				//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Ruim"));
 			}
 		}
 	}

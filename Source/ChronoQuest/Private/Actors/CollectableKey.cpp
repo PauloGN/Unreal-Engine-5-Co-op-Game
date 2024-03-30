@@ -45,7 +45,6 @@ void ACollectableKey::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 void ACollectableKey::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ACollectableKey::Tick(float DeltaTime)
@@ -68,7 +67,7 @@ void ACollectableKey::Tick(float DeltaTime)
 		{
 			if(!bIscollected)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, "Pegou");
+				//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, "Pegou");
 				bIscollected = true;
 				//calling from the server
 				OnRep_bIscollected();

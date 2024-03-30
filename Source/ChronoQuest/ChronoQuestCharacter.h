@@ -46,7 +46,7 @@ class AChronoQuestCharacter : public ACharacter
 
 public:
 	AChronoQuestCharacter();
-	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 
@@ -106,5 +106,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* overHeadWidget = nullptr;
 
+	UPROPERTY(Replicated, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	bool bStartAction;
 };
 

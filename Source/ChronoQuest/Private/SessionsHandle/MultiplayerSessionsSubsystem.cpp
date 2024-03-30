@@ -6,24 +6,15 @@
 
 #include "ChronoQuest/ChronoQuestGameMode.h"
 
-namespace 
-{
-	void PrintString(const FString& text)
-	{
-		if(GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Yellow, text);
-		}
-	}
-}
-
 UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem()
 {
-	PrintString(TEXT("Construction"));
+	//LOG
+	UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: Construction"));
 	bCreateServerOnDestroy = false;
 	lastServerName = "";
 	serverNameToFind = "";
 	mySessionName = FName("Co-op ChronoQuest");
+	bAlreadyStartedAsessionBefore = false;
 }
 
 void UMultiplayerSessionsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -34,12 +25,14 @@ void UMultiplayerSessionsSubsystem::Initialize(FSubsystemCollectionBase& Collect
 
 	gameMapsName.Add("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");
 	gameMapsName.Add("/Game/ThirdPerson/Maps/Chapter01?listen");
+	gameMapsName.Add("/Game/ThirdPerson/Maps/Lobby?listen");
 
 	if(onlineSubsystem)
 	{
 		// it could be any online subsystem service out there (NULL, steam, facebook, google play, etc.)
 		FString subsystemName = onlineSubsystem->GetSubsystemName().ToString();
-		PrintString(subsystemName);
+		//LOG
+		UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: Subsystem name = %s"), *subsystemName);
 
 		bIsLanConnection = subsystemName == FString("Steam") ? false : true;
 
@@ -67,7 +60,9 @@ void UMultiplayerSessionsSubsystem::CreateServer(const FString& serverName)
 {
 	if(serverName.IsEmpty())
 	{
-		PrintString(TEXT("Server Name can not be empty: ") + serverName);
+		//LOG
+		UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: Server name can not be empty"));
+
 		serverCreateDelegate.Broadcast(false);
 		return;
 	}
@@ -93,7 +88,7 @@ void UMultiplayerSessionsSubsystem::CreateServer(const FString& serverName)
 	sessionSettings.bAllowJoinInProgress = true;
 	sessionSettings.bIsDedicated = false;
 	sessionSettings.bShouldAdvertise = true;
-	sessionSettings.NumPublicConnections = 3;
+	sessionSettings.NumPublicConnections = 3;//********************************** THREE CONNECTIONS
 	sessionSettings.bUseLobbiesIfAvailable = true;
 	sessionSettings.bUsesPresence = true;
 	sessionSettings.bAllowJoinViaPresence = true;
@@ -109,8 +104,15 @@ void UMultiplayerSessionsSubsystem::FindServer(const FString& serverName)
 	if (serverName.IsEmpty())
 	{
 		serverJoinDelegate.Broadcast(false);
-		PrintString(TEXT("Server Name can not be empty: ") + serverName);
+		//LOG
+		UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: Server name can not be empty"));
 		return;
+	}
+
+	if (bAlreadyStartedAsessionBefore)
+	{
+		DestroyLastServer();
+		bAlreadyStartedAsessionBefore = false;
 	}
 
 	sessionSearch = MakeShareable(new FOnlineSessionSearch);
@@ -124,9 +126,19 @@ void UMultiplayerSessionsSubsystem::FindServer(const FString& serverName)
 	sessionInterface->FindSessions(0, sessionSearch.ToSharedRef());
 }
 
+void UMultiplayerSessionsSubsystem::DestroyLastServer()
+{
+	//check if session already exists
+	FNamedOnlineSession* existingSession = sessionInterface->GetNamedSession(mySessionName);
+	if (existingSession)
+	{
+		bCreateServerOnDestroy = false;
+		sessionInterface->DestroySession(mySessionName);
+	}
+}
+
 void UMultiplayerSessionsSubsystem::SetMapIndex(const int index)
 {
-
 	if(index < 0 || index > gameMapsName.Num())
 	{
 		mapIndex = 0;
@@ -142,7 +154,8 @@ int UMultiplayerSessionsSubsystem::GetMapIndex()
 
 void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasuccessful)
 {
-	PrintString(FString::Printf(TEXT("Resul: %d"), bWasuccessful));
+	//LOG
+	UE_LOG(LogTemp, Display, TEXT("Resul: %d"), bWasuccessful);
 
 	serverCreateDelegate.Broadcast(bWasuccessful);
 	if(bWasuccessful)
@@ -179,7 +192,8 @@ void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasuccessful)
 	if(results.Num() > 0)
 	{
 		FString msg = FString::Printf(TEXT("Sessions found: %d"), results.Num());
-		PrintString(msg);
+		//LOG
+		UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: %s"), *msg);
 
 		for (FOnlineSessionSearchResult& result : results)
 		{
@@ -191,7 +205,8 @@ void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasuccessful)
 				if(serverName.Equals(serverNameToFind))
 				{
 					correctResult = &result;
-					PrintString(FString::Printf(TEXT("SERVER NAME: %s"), *serverName));
+					//LOG
+					UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem Server name: %s"), *serverName);
 					break;
 				}
 			}
@@ -204,40 +219,111 @@ void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasuccessful)
 		}else
 		{
 			serverJoinDelegate.Broadcast(false);
-			PrintString("...Nope no server....");
+			//LOG
+			UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: Nope no server found"));
 		}
 
 		return;
 	}
 	serverJoinDelegate.Broadcast(false);
-	PrintString("Nope no sessions");
+	//LOG
+	UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: Nope no session"));
 }
 
 void UMultiplayerSessionsSubsystem::OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result)
 {
 	if(result == EOnJoinSessionCompleteResult::Success)
 	{
-		PrintString("you got it");
+		//LOG
+		UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem: You've got a session"));
 		FString ipAddress;
 		if(sessionInterface->GetResolvedConnectString(mySessionName, ipAddress))
 		{
-			PrintString(ipAddress);
+			//LOG
+			UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem IP: %s"), *ipAddress);
 			APlayerController* pc = GetGameInstance()->GetFirstLocalPlayerController();
 
 			if(pc)
 			{
+				bAlreadyStartedAsessionBefore = true;
 				pc->ClientTravel(ipAddress, TRAVEL_Absolute);
 			}
 
 		}else
 		{
 			serverJoinDelegate.Broadcast(false);
-			PrintString("Did not get the ip address...");
+			//LOG
+			UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem IP: Failed"));
 		}
 
 	}else
 	{
 		serverJoinDelegate.Broadcast(false);
-		PrintString(TEXT("Fail to join..."));
+		//LOG
+		UE_LOG(LogTemp, Display, TEXT("UMultiplayerSessionsSubsystem : Failed to joind session"));
+	}
+}
+
+void UMultiplayerSessionsSubsystem::OnEndSessionComplete(FName SessionName, bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+		// Session ended successfully
+		UE_LOG(LogTemp, Warning, TEXT("Session '%s' ended successfully."), *SessionName.ToString());
+	}
+	else
+	{
+		// Failed to end session
+		UE_LOG(LogTemp, Warning, TEXT("Failed to end session '%s'."), *SessionName.ToString());
+	}
+
+	// Remove the delegate binding
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
+	if (OnlineSubsystem)
+	{
+		IOnlineSessionPtr SessionInterface = OnlineSubsystem->GetSessionInterface();
+		if (SessionInterface.IsValid())
+		{
+			SessionInterface->ClearOnEndSessionCompleteDelegate_Handle(OnEndSessionCompleteDelegateHandle);
+		}
+	}
+}
+
+void UMultiplayerSessionsSubsystem::DisconnectFromSession(const FName& SessionName)
+{
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
+	if (OnlineSubsystem)
+	{
+		IOnlineSessionPtr SessionInterface = OnlineSubsystem->GetSessionInterface();
+		if (SessionInterface.IsValid())
+		{
+			// Bind the delegate function
+			OnEndSessionCompleteDelegateHandle = SessionInterface->AddOnEndSessionCompleteDelegate_Handle(FOnEndSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnEndSessionComplete));
+
+			// Start the session ending process
+			SessionInterface->EndSession(SessionName);
+		}
+		else
+		{
+			// Session interface not valid
+			UE_LOG(LogTemp, Error, TEXT("Session interface is not valid."));
+		}
+	}
+	else
+	{
+		// Online subsystem not available
+		UE_LOG(LogTemp, Error, TEXT("Online subsystem is not available."));
+	}
+}
+
+void UMultiplayerSessionsSubsystem::GoToNextLevel(const int index)
+{
+	SetMapIndex(index);
+
+	UWorld* world = GetWorld();
+	if (world)
+	{
+		world->GetAuthGameMode()->bUseSeamlessTravel = true;
+		world->ServerTravel(*gameMapsName[mapIndex]);
 	}
 }
