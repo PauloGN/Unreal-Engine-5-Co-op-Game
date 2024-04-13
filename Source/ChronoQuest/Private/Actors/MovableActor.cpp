@@ -7,8 +7,10 @@ AMovableActor::AMovableActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	NetUpdateFrequency = 100;
 	if (HasAuthority())
 	{
+
 		bReplicates = true;
 		AActor::SetReplicateMovement(true);
 

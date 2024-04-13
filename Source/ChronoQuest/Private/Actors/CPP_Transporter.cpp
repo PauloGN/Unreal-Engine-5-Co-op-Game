@@ -7,6 +7,7 @@
 
 UCPP_Transporter::UCPP_Transporter()
 {
+
 	PrimaryComponentTick.bCanEverTick = true;
 	SetIsReplicatedByDefault(true);
 
