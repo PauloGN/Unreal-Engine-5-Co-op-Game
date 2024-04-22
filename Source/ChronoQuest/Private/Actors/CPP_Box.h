@@ -23,7 +23,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	//Replication VARIABLES
+#pragma region VARIABLES Replication
+	
+	//UPROPERTY(Replicated, BlueprintReadWrite)
 	UPROPERTY(ReplicatedUsing = OnRep_ReplicatedFloat, BlueprintReadWrite)
 	float replicatedFloat;
 
@@ -32,10 +34,20 @@ public:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	//Timer Replicated float
-	void DecreaseReplicatedFloat();
-	FTimerHandle testTimer;
 
+	//Timer Replicated float
+	UPROPERTY(ReplicatedUsing = OnRep_CountingDownFloat, BlueprintReadWrite)
+	float CountingDownFloat;
+
+	UFUNCTION(BlueprintCallable)
+	void OnRep_CountingDownFloat();
+
+	void DecreaseReplicatedFloat();
+	FTimerHandle TimerCountingDownHandle;
+#pragma endregion
+
+
+	FTimerHandle testTimer;
 	//Multicast RPC
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void MulticastRPCExplode();
