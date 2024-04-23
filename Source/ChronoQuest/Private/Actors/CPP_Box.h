@@ -46,7 +46,6 @@ public:
 	FTimerHandle TimerCountingDownHandle;
 #pragma endregion
 
-
 	FTimerHandle testTimer;
 	//Multicast RPC
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
@@ -54,5 +53,4 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* explosionEffect;
-
 };

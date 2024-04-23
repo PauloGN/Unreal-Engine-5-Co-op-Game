@@ -18,7 +18,7 @@ UCPP_Transporter::UCPP_Transporter()
 	startPoint = FVector::Zero();
 	endPoint = FVector::Zero();
 	bArePointsSet = false;
-	bMoveWithOneTrigger = false;
+	bMoveWith_X_Triggers = false;
 }
 
 void UCPP_Transporter::SetPoints(const FVector& start, const FVector& end)
@@ -37,22 +37,28 @@ void UCPP_Transporter::OntriggerActivated()
 {
 	++activateTriggerActorsCount;
 
-	if(bMoveWithOneTrigger)
+	if(bMoveWith_X_Triggers)
 	{
-		bAllTriggerActorsTriggered = true;
+		if(activateTriggerActorsCount >= numOfTriggersToActivate)
+		{
+			bAllTriggerActorsTriggered = true;
+		}
+		return;		
 	}
 
+	//Only runs this logic in case there is no predefined number of triggers
 	if(activateTriggerActorsCount >= triggerActors.Num())
 	{
 		bAllTriggerActorsTriggered = true;
-		//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Black, FString::Printf(TEXT("AEWWWW %d"), activateTriggerActorsCount));
+		//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Black, FString::Printf(TEXT("activateTriggerActorsCount %d"), activateTriggerActorsCount));
+		//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Black, FString::Printf(TEXT("numOfTriggersToActivate %d"), numOfTriggersToActivate));
 	}
 }
 
 void UCPP_Transporter::OntriggerDeactivated()
 {
 	--activateTriggerActorsCount;
-	const int numOfNeededTriggers = bMoveWithOneTrigger ? 1 : triggerActors.Num();
+	const int numOfNeededTriggers = bMoveWith_X_Triggers ? numOfTriggersToActivate : triggerActors.Num();
 
 	if (activateTriggerActorsCount < numOfNeededTriggers)
 	{

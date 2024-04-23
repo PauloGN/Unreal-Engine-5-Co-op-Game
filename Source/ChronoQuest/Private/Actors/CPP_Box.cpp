@@ -98,7 +98,6 @@ void ACPP_Box::MulticastRPCExplode_Implementation()
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, FString::Printf(TEXT("Client %d: Multicast call"), static_cast<int>(GPlayInEditorID)));
 	}
 
-
 	if(!IsRunningDedicatedServer() && explosionEffect != nullptr)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), explosionEffect, GetActorLocation(), FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
