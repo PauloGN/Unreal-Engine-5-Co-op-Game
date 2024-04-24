@@ -9,14 +9,16 @@ ACPP_Box::ACPP_Box()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 	replicatedFloat = 100.0f;
+	CountingDownFloat = 0.0f;
 }
 
 // Called when the game starts or when spawned
 void ACPP_Box::BeginPlay()
 {
 	Super::BeginPlay();
-	SetReplicates(true);
+	//SetReplicates(true);
 	SetReplicateMovement(true);
 	
 	if (HasAuthority())
@@ -29,7 +31,9 @@ void ACPP_Box::BeginPlay()
 
 	if(HasAuthority())
 	{
-		GetWorld()->GetTimerManager().SetTimer(testTimer, this, &ThisClass::DecreaseReplicatedFloat, 2.0f, false);
+		CountingDownFloat = 0.0f;
+
+		GetWorld()->GetTimerManager().SetTimer(TimerCountingDownHandle, this, &ThisClass::DecreaseReplicatedFloat, 2.0f, false);
 		GetWorld()->GetTimerManager().SetTimer(testTimer, this, &ThisClass::MulticastRPCExplode, 1.0f, false);
 	}
 }
@@ -60,18 +64,24 @@ void ACPP_Box::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 
 	//Especial Macro called for each variable that we designate to be replicated
 	DOREPLIFETIME(ACPP_Box, replicatedFloat);
+	DOREPLIFETIME(ACPP_Box, CountingDownFloat);
+}
+
+void ACPP_Box::OnRep_CountingDownFloat()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::Printf(TEXT("ID %d: CountingDown"), static_cast<int>(GPlayInEditorID)));
 }
 
 void ACPP_Box::DecreaseReplicatedFloat()
 {
 	if(HasAuthority())
 	{
-		replicatedFloat -= 1.0f;
+		CountingDownFloat += 1.0f;
 		//calling on the server
-		OnRep_ReplicatedFloat();
-		if(replicatedFloat > 0.0f)
+		OnRep_CountingDownFloat();
+		if(CountingDownFloat < 9999.0f)
 		{
-			//GetWorld()->GetTimerManager().SetTimer(testTimer, this, &ThisClass::DecreaseReplicatedFloat, 2.0f, false);
+			GetWorld()->GetTimerManager().SetTimer(TimerCountingDownHandle, this, &ThisClass::DecreaseReplicatedFloat, 1.0f, false);
 		}
 	}
 }
@@ -87,7 +97,6 @@ void ACPP_Box::MulticastRPCExplode_Implementation()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, FString::Printf(TEXT("Client %d: Multicast call"), static_cast<int>(GPlayInEditorID)));
 	}
-
 
 	if(!IsRunningDedicatedServer() && explosionEffect != nullptr)
 	{

@@ -51,5 +51,8 @@ public:
 	bool bAllTriggerActorsTriggered;
 
 	UPROPERTY(BlueprintReadWrite, EditInstanceOnly)
-	bool bMoveWithOneTrigger;
+	bool bMoveWith_X_Triggers;
+
+	UPROPERTY(BlueprintReadWrite, EditInstanceOnly)
+	int numOfTriggersToActivate = 1;
 };
