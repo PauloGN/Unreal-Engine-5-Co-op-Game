@@ -53,4 +53,6 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* explosionEffect;
+
+	bool test;
 };
