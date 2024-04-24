@@ -54,4 +54,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* explosionEffect;
 
+	//Testing merge and branches
+
 };
