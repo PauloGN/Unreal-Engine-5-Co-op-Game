@@ -95,7 +95,6 @@ void ATheFireKey::OnRep_bIsFireOn()
 	ambientLight->SetVisibility(true);
 	shadowedLight->SetVisibility(true);
 	smoke->AddRelativeLocation(FVector(0.0f, 0.0f, -10.f));
-
 }
 
 void ATheFireKey::LightFire_Implementation()
