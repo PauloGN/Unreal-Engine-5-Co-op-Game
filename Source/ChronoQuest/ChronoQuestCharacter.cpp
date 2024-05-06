@@ -92,10 +92,29 @@ void AChronoQuestCharacter::BeginPlay()
 	}
 }
 
+void AChronoQuestCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+}
+
+void AChronoQuestCharacter::OnRep_IsInteracting()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Yellow, TEXT("AAAAAAAAAAAA"));
+}
+
 void AChronoQuestCharacter::ServerRPC_Walk_Implementation(const float speed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = speed;
 	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, "WALK Called");
+
+	//if(speed == WalkSpeed)
+	//{
+	//	bIsInteracting = true;
+	//}else
+	//{
+	//	bIsInteracting = false;
+	//}
 
 }
 
@@ -252,9 +271,8 @@ void AChronoQuestCharacter::IA_Interaction(const FInputActionValue& Value)
 			{
 				PushableActor->Mesh->SetSimulatePhysics(false);
 			}
-
-
-		}else
+		}
+		else
 		{
 			GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 			ServerRPC_Walk(WalkSpeed);
@@ -264,7 +282,6 @@ void AChronoQuestCharacter::IA_Interaction(const FInputActionValue& Value)
 			{
 				PushableActor->Mesh->SetSimulatePhysics(true);
 			}
-
 		}
 	}
 }

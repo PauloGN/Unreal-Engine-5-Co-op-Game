@@ -76,9 +76,11 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+	virtual void Tick(float DeltaSeconds) override;
+
 #pragma region PUSHING
 
-	UPROPERTY(Replicated, BlueprintReadWrite) bool bIsInteracting = false;
+	UPROPERTY(ReplicatedUsing = OnRep_IsInteracting, BlueprintReadWrite) bool bIsInteracting = false;
 	UPROPERTY(Replicated, BlueprintReadWrite) bool bCanPushObj = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float SprintSpeed = 600.0f;
 	UPROPERTY(EditAnywhere ,BlueprintReadWrite) float WalkSpeed = 100.0f;
@@ -88,6 +90,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FVector2D MovementVector;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) TObjectPtr<APushableActor> PushableActor;
+	
+	UFUNCTION()
+	void OnRep_IsInteracting ();
 
 #pragma endregion
 
