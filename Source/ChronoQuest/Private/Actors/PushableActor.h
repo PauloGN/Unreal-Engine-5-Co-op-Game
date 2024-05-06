@@ -34,32 +34,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Environment")
 	UPhysicsConstraintComponent* PhysicsComponent;
 
-	virtual void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
-
-
 private:
 
-	bool CanPush();
-
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "References")
 	TObjectPtr<AChronoQuestCharacter> Character;
-
-#pragma region TIME LINE
-
-
-	UPROPERTY(EditAnywhere, Category = "TimeLineProps")
-	TObjectPtr<UCurveFloat> CurveFloatAmim;
-
-	FTimeline MoveTimeLine;
-
-	//Functions to bind
-	void BindingTimeLine();
-
-	//CallBack
-	UFUNCTION()
-	void CallBackFunc(float value);
-
-	UFUNCTION()
-	void Play();
-
-# pragma endregion
 };

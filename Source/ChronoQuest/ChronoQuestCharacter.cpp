@@ -13,6 +13,7 @@
 #include "Net/UnrealNetwork.h"
 #include <Engine/StaticMeshActor.h>
 
+#include "Actors/PushableActor.h"
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -60,6 +61,10 @@ AChronoQuestCharacter::AChronoQuestCharacter()
 
 	overHeadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PlayerName"));
 	overHeadWidget->SetupAttachment(RootComponent);
+
+	GetCharacterMovement()->SetIsReplicated(true);
+
+	GetCharacterMovement()->ForceReplicationUpdate();
 }
 
 void AChronoQuestCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -67,6 +72,8 @@ void AChronoQuestCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AChronoQuestCharacter, bStartAction);
+	DOREPLIFETIME(AChronoQuestCharacter, bIsInteracting);
+	DOREPLIFETIME(AChronoQuestCharacter, bCanPushObj);
 
 }
 
@@ -84,6 +91,14 @@ void AChronoQuestCharacter::BeginPlay()
 		}
 	}
 }
+
+void AChronoQuestCharacter::ServerRPC_Walk_Implementation(const float speed)
+{
+	GetCharacterMovement()->MaxWalkSpeed = speed;
+	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, "WALK Called");
+
+}
+
 
 #pragma region RPC
 
@@ -174,6 +189,9 @@ void AChronoQuestCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AChronoQuestCharacter::Look);
+
+		// Interaction
+		EnhancedInputComponent->BindAction(Interaction, ETriggerEvent::Triggered, this, &AChronoQuestCharacter::IA_Interaction);
 	}
 	else
 	{
@@ -184,7 +202,7 @@ void AChronoQuestCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 void AChronoQuestCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
+	MovementVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
@@ -214,5 +232,39 @@ void AChronoQuestCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void AChronoQuestCharacter::IA_Interaction(const FInputActionValue& Value)
+{
+
+	if(bCanPushObj)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("X: %f -- Y: %f"), MovementVector.X, MovementVector.Y));
+
+		if(bIsInteracting)
+		{
+			bIsInteracting = false;
+			GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+			ServerRPC_Walk(SprintSpeed);
+
+			if(PushableActor)
+			{
+				PushableActor->Mesh->SetSimulatePhysics(false);
+			}
+
+
+		}else
+		{
+			GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+			ServerRPC_Walk(WalkSpeed);
+			bIsInteracting = true;
+
+			if (PushableActor)
+			{
+				PushableActor->Mesh->SetSimulatePhysics(true);
+			}
+
+		}
 	}
 }

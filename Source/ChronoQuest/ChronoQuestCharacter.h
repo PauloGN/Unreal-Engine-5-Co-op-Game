@@ -11,6 +11,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
+class APushableActor;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -44,6 +45,10 @@ class AChronoQuestCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	/** Interaction Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* Interaction;
+
 public:
 	AChronoQuestCharacter();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -55,9 +60,10 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-			
 
-protected:
+	/** Called for Interaction input */
+	void IA_Interaction(const FInputActionValue& Value);
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
@@ -69,6 +75,23 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+#pragma region PUSHING
+
+	UPROPERTY(Replicated, BlueprintReadWrite) bool bIsInteracting = false;
+	UPROPERTY(Replicated, BlueprintReadWrite) bool bCanPushObj = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float SprintSpeed = 600.0f;
+	UPROPERTY(EditAnywhere ,BlueprintReadWrite) float WalkSpeed = 100.0f;
+	
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_Walk(const float speed);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) FVector2D MovementVector;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) TObjectPtr<APushableActor> PushableActor;
+
+#pragma endregion
+
+
 
 #pragma region RPC
 
@@ -108,5 +131,6 @@ private:
 
 	UPROPERTY(Replicated, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	bool bStartAction;
+
 };
 
