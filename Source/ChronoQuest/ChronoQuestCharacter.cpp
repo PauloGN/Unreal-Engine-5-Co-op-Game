@@ -108,13 +108,13 @@ void AChronoQuestCharacter::ServerRPC_Walk_Implementation(const float speed)
 	GetCharacterMovement()->MaxWalkSpeed = speed;
 	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, "WALK Called");
 
-	//if(speed == WalkSpeed)
-	//{
-	//	bIsInteracting = true;
-	//}else
-	//{
-	//	bIsInteracting = false;
-	//}
+	if(speed == WalkSpeed)
+	{
+		bIsInteracting = true;
+	}else
+	{
+		bIsInteracting = false;
+	}
 
 }
 
