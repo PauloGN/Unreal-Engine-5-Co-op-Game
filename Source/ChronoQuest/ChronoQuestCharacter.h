@@ -96,8 +96,6 @@ public:
 
 #pragma endregion
 
-
-
 #pragma region RPC
 
 	//UFUNCTION(BlueprintCallable)
@@ -136,6 +134,4 @@ private:
 
 	UPROPERTY(Replicated, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	bool bStartAction;
-
 };
-

@@ -28,14 +28,28 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UStaticMeshComponent* triggerMesh;
+
 	UPROPERTY(EditAnywhere, Category = "Environment")
 	UStaticMeshComponent* Mesh;
 
 	UPROPERTY(EditAnywhere, Category = "Environment")
 	UPhysicsConstraintComponent* PhysicsComponent;
 
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void RPCSERVER_ActorOverlapping(AActor* OverlappingActor);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void RPCSERVER_ActorExitOverlapping();
+
+	UPROPERTY(BlueprintReadWrite) bool bCanPushObj = false;
+
 private:
 
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "References")
 	TObjectPtr<AChronoQuestCharacter> Character;
+
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "References")
+	int32 InteractionsCount = 0;
 };
