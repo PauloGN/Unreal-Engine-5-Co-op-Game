@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Components/TimelineComponent.h"
 #include "PushableActor.generated.h"
 
 class UPhysicsConstraintComponent;
@@ -36,20 +35,18 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Environment")
 	UPhysicsConstraintComponent* PhysicsComponent;
-
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void RPCSERVER_ActorOverlapping(AActor* OverlappingActor);
-
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void RPCSERVER_ActorExitOverlapping();
-
+	
 	UPROPERTY(BlueprintReadWrite) bool bCanPushObj = false;
+
+
+	void AttachToOwnerActor();
+	void DetachOwnerFromActor();
 
 private:
 
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "References")
-	TObjectPtr<AChronoQuestCharacter> Character;
+	void MoveBox();
+	void ApplyMovement( const float speed);
 
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "References")
-	int32 InteractionsCount = 0;
+	TObjectPtr<AChronoQuestCharacter> Character;
 };

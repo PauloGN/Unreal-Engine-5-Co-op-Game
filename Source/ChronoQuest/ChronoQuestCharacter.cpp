@@ -73,7 +73,6 @@ void AChronoQuestCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(AChronoQuestCharacter, bStartAction);
 	DOREPLIFETIME(AChronoQuestCharacter, bIsInteracting);
 	DOREPLIFETIME(AChronoQuestCharacter, bCanPushObj);
-
 }
 
 void AChronoQuestCharacter::BeginPlay()
@@ -97,9 +96,11 @@ void AChronoQuestCharacter::Tick(float DeltaSeconds)
 
 }
 
-void AChronoQuestCharacter::OnRep_IsInteracting()
+void AChronoQuestCharacter::PushingAnimSettings()
 {
-	
+
+
+
 }
 
 void AChronoQuestCharacter::ServerRPC_Walk_Implementation(const float speed)
@@ -111,22 +112,16 @@ void AChronoQuestCharacter::ServerRPC_Walk_Implementation(const float speed)
 	{
 		bIsInteracting = true;
 
-	if (PushableActor)
-	{
-		PushableActor->Mesh->SetSimulatePhysics(true);
-
-		//FAttachmentTransformRules AttachmentTransformRules(EAttachmentRule::KeepWorld, true);
-		//PushableActor->AttachToActor(this, AttachmentTransformRules, "RightHand");
-	}
+		if (PushableActor)
+		{
+			//PushableActor->Mesh->SetSimulatePhysics(true);
+		}
 	}else
 	{
 		bIsInteracting = false;
 		if (PushableActor)
 		{
-			PushableActor->Mesh->SetSimulatePhysics(false);
-
-			//FDetachmentTransformRules DetachmentTransform(EDetachmentRule::KeepWorld , true);
-			//PushableActor->DetachFromActor(DetachmentTransform);
+			//PushableActor->Mesh->SetSimulatePhysics(false);
 		}
 	}
 }
@@ -271,8 +266,6 @@ void AChronoQuestCharacter::IA_Interaction(const FInputActionValue& Value)
 {
 	if(bCanPushObj)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("X: %f -- Y: %f"), MovementVector.X, MovementVector.Y));
-
 		if(bIsInteracting)
 		{
 			GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
@@ -281,10 +274,7 @@ void AChronoQuestCharacter::IA_Interaction(const FInputActionValue& Value)
 
 			if(PushableActor)
 			{
-				PushableActor->Mesh->SetSimulatePhysics(false);
-
-				//FDetachmentTransformRules DetachmentTransform(EDetachmentRule::KeepWorld, true);
-				//PushableActor->DetachFromActor(DetachmentTransform);
+				//PushableActor->Mesh->SetSimulatePhysics(false);
 			}
 		}
 		else
@@ -295,9 +285,7 @@ void AChronoQuestCharacter::IA_Interaction(const FInputActionValue& Value)
 
 			if (PushableActor)
 			{
-				PushableActor->Mesh->SetSimulatePhysics(true);
-				//FAttachmentTransformRules AttachmentTransformRules(EAttachmentRule::KeepWorld, true);
-				//PushableActor->AttachToActor(this, AttachmentTransformRules, "RightHand");
+				//PushableActor->Mesh->SetSimulatePhysics(true);
 			}
 		}
 	}

@@ -86,6 +86,9 @@ void APushableActor::Tick(float DeltaTime)
 
 		if (triggerActor)
 		{
+
+			MoveBox();
+
 			if (!bCanPushObj)
 			{
 				bCanPushObj = true;
@@ -104,7 +107,6 @@ void APushableActor::Tick(float DeltaTime)
 					Character->bCanPushObj = true;
 					Character->PushableActor = this;
 					bCanPushObj = true;
-					InteractionsCount++;
 				}
 			}
 		}
@@ -120,43 +122,58 @@ void APushableActor::Tick(float DeltaTime)
 				{
 					Character->bCanPushObj = false;
 					Character->PushableActor = nullptr;
-					Character->bIsInteracting = false;
+					//Character->bIsInteracting = false;
 					bCanPushObj = false;
-					InteractionsCount--;
 					Character = nullptr;
 				}
 			}
 		}
 	}
-
 }
 
-void APushableActor::RPCSERVER_ActorOverlapping_Implementation(AActor* OverlappingActor)
+void APushableActor::AttachToOwnerActor()
 {
+	FAttachmentTransformRules AttachmentTransformRules(EAttachmentRule::KeepWorld, true);
+	AttachToActor(Character, AttachmentTransformRules, "RightHand");
+}
+
+void APushableActor::DetachOwnerFromActor()
+{
+	FDetachmentTransformRules DetachmentTransform(EDetachmentRule::KeepWorld, true);
+	DetachFromActor(DetachmentTransform);
+}
+
+void APushableActor::MoveBox()
+{
+	
 	if(Character)
 	{
-		return;	
-	}
 
-	Character = Cast<AChronoQuestCharacter>(OverlappingActor);
+		//Not moving forward or backwards
+		if(Character->MovementVector.Y == 0)
+		{
+			GEngine->AddOnScreenDebugMessage(10, 1.0f, FColor::Red, "Not moving forward or backwards");
+			
+		}else if(Character->MovementVector.Y > 0 && Character->bIsInteracting)
+		{
+			GEngine->AddOnScreenDebugMessage(10, 1.0f, FColor::Green, "moving forward");
+			ApplyMovement(100);
+		}
 
-	if(Character)
+		GEngine->AddOnScreenDebugMessage(11, 1.0f, FColor::Red, FString::Printf(TEXT("X: %f Y: %f"), Character->MovementVector.X, Character->MovementVector.Y));
+
+
+	}else
 	{
-		Character->bCanPushObj = true;
-		Character->PushableActor = this;
-		bCanPushObj = true;
-		InteractionsCount++;
+		GEngine->AddOnScreenDebugMessage(10, 1.0f, FColor::Red, "NOT Move BOX");
 	}
+
 }
 
-void APushableActor::RPCSERVER_ActorExitOverlapping_Implementation()
+void APushableActor::ApplyMovement(const float speed)
 {
-	if (Character)
-	{
-		Character->bCanPushObj = false;
-		Character->PushableActor = nullptr;
-		bCanPushObj = false;
-		InteractionsCount--;
-	}
+	FVector SelectedVector = Character->GetMesh()->GetRightVector() * speed;
+	FVector TargetLocation = GetActorLocation() + SelectedVector;
+	FVector NewLocation = FMath::VInterpTo(GetActorLocation(), TargetLocation, GetWorld()->DeltaTimeSeconds, 5);
+	SetActorRelativeLocation(NewLocation);
 }
-

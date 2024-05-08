@@ -80,7 +80,7 @@ public:
 
 #pragma region PUSHING
 
-	UPROPERTY(ReplicatedUsing = OnRep_IsInteracting, BlueprintReadWrite) bool bIsInteracting = false;
+	UPROPERTY(Replicated, BlueprintReadWrite) bool bIsInteracting = false;
 	UPROPERTY(Replicated, BlueprintReadWrite) bool bCanPushObj = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float SprintSpeed = 600.0f;
 	UPROPERTY(EditAnywhere ,BlueprintReadWrite) float WalkSpeed = 100.0f;
@@ -92,7 +92,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) TObjectPtr<APushableActor> PushableActor;
 	
 	UFUNCTION()
-	void OnRep_IsInteracting ();
+	void PushingAnimSettings();
 
 #pragma endregion
 
