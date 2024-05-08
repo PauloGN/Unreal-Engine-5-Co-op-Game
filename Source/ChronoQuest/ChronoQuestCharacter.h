@@ -94,6 +94,14 @@ public:
 	UFUNCTION()
 	void PushingAnimSettings();
 
+	////////////////////////// Pushable Objects
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interactions")
+	float SphereRadius = 100.0f; // Radius of the sphere
+
+private:
+
+	void SphereInteraction();
+
 #pragma endregion
 
 #pragma region RPC

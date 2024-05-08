@@ -15,6 +15,7 @@
 
 #include "Actors/PushableActor.h"
 #include "Components/WidgetComponent.h"
+#include "Interactions/InteractInterface.h"
 #include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -103,6 +104,61 @@ void AChronoQuestCharacter::PushingAnimSettings()
 
 }
 
+void AChronoQuestCharacter::SphereInteraction()
+{
+	// Get a reference to the world
+    UWorld* World = GetWorld();
+    if (!World)
+    {
+        return;
+    }
+
+    // Define the sphere parameters
+	const float HalthZhight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+    FVector SphereLocation = GetActorLocation(); // Assuming you want to check overlap around the character
+	SphereLocation.Z -= HalthZhight;
+
+    // Define object types you want to detect overlap with
+    FCollisionObjectQueryParams ObjectTypes;
+	ObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_Visibility); // Example: Detect overlap with physics bodies
+	ObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_PhysicsBody); // Example: Detect overlap with physics bodies
+
+    // Define response parameters
+    FCollisionQueryParams CollisionParams;
+    CollisionParams.bReturnPhysicalMaterial = false; // Optionally return physical material
+
+    // Perform the overlap check
+    TArray<FOverlapResult> OverlapResults;
+    World->OverlapMultiByObjectType(
+        OverlapResults,
+        SphereLocation,
+        FQuat::Identity,
+        ObjectTypes,
+        FCollisionShape::MakeSphere(SphereRadius),
+        CollisionParams
+    );
+
+    // Process overlap results
+    for (const FOverlapResult& OverlapResult : OverlapResults)
+    {
+        AActor* OverlappingActor = OverlapResult.GetActor();
+        // Check if the overlapping actor implements a specific interface
+        if (OverlappingActor->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
+        {
+            // Cast to the interface
+			IInteractInterface* YourInterface = Cast<IInteractInterface>(OverlappingActor);
+            if (YourInterface)
+            {
+                // Call interface function
+                YourInterface->OnInteracted(this);
+				break;
+            }
+        }
+    }
+
+	DrawDebugSphere(GetWorld(), SphereLocation, SphereRadius, 36, FColor::Green, false, 2.0f);
+}
+
 void AChronoQuestCharacter::ServerRPC_Walk_Implementation(const float speed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = speed;
@@ -125,7 +181,6 @@ void AChronoQuestCharacter::ServerRPC_Walk_Implementation(const float speed)
 		}
 	}
 }
-
 
 #pragma region RPC
 
@@ -264,6 +319,9 @@ void AChronoQuestCharacter::Look(const FInputActionValue& Value)
 
 void AChronoQuestCharacter::IA_Interaction(const FInputActionValue& Value)
 {
+
+	SphereInteraction();
+
 	if(bCanPushObj)
 	{
 		if(bIsInteracting)

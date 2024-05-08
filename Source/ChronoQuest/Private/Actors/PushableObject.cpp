@@ -16,6 +16,8 @@ APushableObject::APushableObject()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	Mesh->SetIsReplicated(true);
 	SetRootComponent(Mesh);
+
+	Mesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 }
 
 // Called when the game starts or when spawned
