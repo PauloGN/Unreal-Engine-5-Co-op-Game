@@ -12,6 +12,7 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 class APushableActor;
+class UPushComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -95,8 +96,11 @@ public:
 	void PushingAnimSettings();
 
 	////////////////////////// Pushable Objects
+
+	float PushRange;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interactions")
-	float SphereRadius = 100.0f; // Radius of the sphere
+	UPushComponent* PushComponent;
 
 private:
 

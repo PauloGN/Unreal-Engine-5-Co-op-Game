@@ -16,6 +16,7 @@
 #include "Actors/PushableActor.h"
 #include "Components/WidgetComponent.h"
 #include "Interactions/InteractInterface.h"
+#include "Interactions/PushComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -65,6 +66,13 @@ AChronoQuestCharacter::AChronoQuestCharacter()
 
 	GetCharacterMovement()->SetIsReplicated(true);
 	GetCharacterMovement()->ForceReplicationUpdate();
+
+#pragma region PUSH
+
+	PushComponent = CreateDefaultSubobject<UPushComponent>("PushComponent");
+
+#pragma endregion
+
 }
 
 void AChronoQuestCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -87,6 +95,7 @@ void AChronoQuestCharacter::BeginPlay()
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			PushRange = PushComponent->PushRange;
 		}
 	}
 }
@@ -134,7 +143,7 @@ void AChronoQuestCharacter::SphereInteraction()
         SphereLocation,
         FQuat::Identity,
         ObjectTypes,
-        FCollisionShape::MakeSphere(SphereRadius),
+        FCollisionShape::MakeSphere(PushRange),
         CollisionParams
     );
 
@@ -156,7 +165,7 @@ void AChronoQuestCharacter::SphereInteraction()
         }
     }
 
-	DrawDebugSphere(GetWorld(), SphereLocation, SphereRadius, 36, FColor::Green, false, 2.0f);
+	DrawDebugSphere(GetWorld(), SphereLocation, PushRange, 36, FColor::Green, false, 2.0f);
 }
 
 void AChronoQuestCharacter::ServerRPC_Walk_Implementation(const float speed)
