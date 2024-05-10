@@ -39,4 +39,10 @@ public:
 	UPROPERTY(BlueprintReadonly, EditInstanceOnly, meta = (MakeEditWidget = "true"))
 	TArray<FTransform>  PushTransforms;
 
+
+
+private:
+	FTransform GetWorldPushTransform(const int32 Index);
+
+	FTransform CharacterPushTransform;
 };

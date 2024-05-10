@@ -17,9 +17,7 @@ public:
 	// Sets default values for this component's properties
 	UPushComponent();
 
-	TObjectPtr<APushableObject> CurretPushable;
-
-	void Teest();
+	TObjectPtr<APushableObject> CurrentPushable;
 
 protected:
 	// Called when the game starts

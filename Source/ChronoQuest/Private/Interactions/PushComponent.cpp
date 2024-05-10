@@ -13,12 +13,6 @@ UPushComponent::UPushComponent()
 	SetIsReplicatedByDefault(true);
 }
 
-
-void UPushComponent::Teest()
-{
-	GEngine->AddOnScreenDebugMessage(323, 1.0f, FColor::Green, "void UPushComponent::Teest()");
-}
-
 // Called when the game starts
 void UPushComponent::BeginPlay()
 {
