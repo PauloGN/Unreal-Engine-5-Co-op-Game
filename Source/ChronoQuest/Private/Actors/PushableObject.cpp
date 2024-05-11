@@ -22,7 +22,6 @@ APushableObject::APushableObject()
 	SetRootComponent(Mesh);
 
 	Mesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
-
 }
 
 FTransform APushableObject::GetWorldPushTransform(const int32 Index)

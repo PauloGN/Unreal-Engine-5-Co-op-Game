@@ -27,22 +27,24 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Environment")
 	TObjectPtr<UStaticMeshComponent> Mesh;
 
-
+	//Go through all existing PushTransform and returns the one nearest the player
 	int32 FindClosestPushTransform(FVector2D CharacterCurrentLocation, float PushRange);
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	//Overriden function from the interface that defines what should happen on the character interaction
 	virtual void OnInteracted(AChronoQuestCharacter* myCharacter) override;
 
 	UPROPERTY(BlueprintReadonly, EditInstanceOnly, meta = (MakeEditWidget = "true"))
 	TArray<FTransform>  PushTransforms;
 
-
-
 private:
+
+	//Gets the world transform of an specific PushTransform by its index 
 	FTransform GetWorldPushTransform(const int32 Index);
 
+	//Variable saves the position that character should be alined to in order to push the object avoiding weird position.
 	FTransform CharacterPushTransform;
 };

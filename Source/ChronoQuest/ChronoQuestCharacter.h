@@ -97,6 +97,7 @@ public:
 
 	////////////////////////// Pushable Objects
 
+	/**Search and interaction/radius range*/
 	float PushRange;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interactions")
