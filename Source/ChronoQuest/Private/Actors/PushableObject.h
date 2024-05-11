@@ -47,4 +47,7 @@ private:
 
 	//Variable saves the position that character should be alined to in order to push the object avoiding weird position.
 	FTransform CharacterPushTransform;
+
+	bool CheckAreaByCapsuleTracedByChanel(AChronoQuestCharacter* myCharacter);
+
 };
