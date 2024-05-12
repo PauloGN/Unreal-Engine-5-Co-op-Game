@@ -103,6 +103,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interactions")
 	UPushComponent* PushComponent;
 
+	UFUNCTION(Server, Reliable)
+	void ServerSetActorTransform(FTransform CharacterPushTransform);
+
 private:
 
 	void SphereInteraction();

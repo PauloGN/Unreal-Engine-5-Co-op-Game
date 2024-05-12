@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interactions/InteractInterface.h"
-#include <Components/ArrowComponent.h>
 #include "PushableObject.generated.h"
 
 
@@ -30,6 +29,8 @@ protected:
 	//Go through all existing PushTransform and returns the one nearest the player
 	int32 FindClosestPushTransform(FVector2D CharacterCurrentLocation, float PushRange);
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -46,8 +47,13 @@ private:
 	FTransform GetWorldPushTransform(const int32 Index);
 
 	//Variable saves the position that character should be alined to in order to push the object avoiding weird position.
+	UPROPERTY(Replicated)
 	FTransform CharacterPushTransform;
+
+	UPROPERTY(Replicated)
+	bool bReadyAndGoodToPush;
 
 	bool CheckAreaByCapsuleTracedByChanel(AChronoQuestCharacter* myCharacter);
 
+	bool CheckFowardObjectWithLineTraceByChanel(AChronoQuestCharacter* myCharacter);
 };

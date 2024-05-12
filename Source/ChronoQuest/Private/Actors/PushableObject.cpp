@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interactions/PushComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 APushableObject::APushableObject()
@@ -14,7 +15,6 @@ APushableObject::APushableObject()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	NetUpdateFrequency = 100;
 	bReplicates = true;
 	AActor::SetReplicateMovement(true);
 
@@ -67,7 +67,7 @@ bool APushableObject::CheckAreaByCapsuleTracedByChanel(AChronoQuestCharacter* my
 		FCollisionShape::MakeCapsule(Radius, HalfHeight),
 		TraceParams
 	);
-	
+
 	const float CharWalkableFloorZ = myCharacter->GetCharacterMovement()->GetWalkableFloorZ();
 	const float HitResultImpactNormalZ = HitResult.ImpactNormal.Z;
 
@@ -108,8 +108,49 @@ bool APushableObject::CheckAreaByCapsuleTracedByChanel(AChronoQuestCharacter* my
 		UE_LOG(LogTemp, Warning, TEXT("Pushable"));
 	}
 
-
 	return CanPush;
+}
+
+bool APushableObject::CheckFowardObjectWithLineTraceByChanel(AChronoQuestCharacter* myCharacter)
+{
+	FVector StartLocation = GetActorLocation(); // Start location of the trace
+	FVector EndLocation = CharacterPushTransform.GetLocation(); // End location of the trace
+
+	FHitResult HitResult; // Variable to store the result of the trace
+	FCollisionQueryParams TraceParams(FName(TEXT("Trace")), true, this); // Parameters for the trace
+	TraceParams.AddIgnoredActor(this);
+	TraceParams.AddIgnoredActor(myCharacter);
+
+	TraceParams.bTraceComplex = true; // Trace against complex geometry
+	TraceParams.bReturnPhysicalMaterial = false; // Return the physical material of the hit
+
+	// Perform the line trace
+	bool bHit = GetWorld()->LineTraceSingleByChannel(
+		HitResult, // Hit result
+		StartLocation, // Start location
+		EndLocation, // End location
+		ECC_GameTraceChannel1, // Trace channel
+		TraceParams // Additional parameters
+	);
+
+	if (bHit)
+	{
+		// If we hit something, do something with the hit result
+		AActor* HitActor = HitResult.GetActor();
+		if (HitActor)
+		{
+			// Do something with the hit actor
+		}
+
+		// Draw debug line for visualization
+		DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 1.f, 0, 2.0f);
+	}
+	else
+	{
+		// If we didn't hit anything, handle accordingly
+	}
+
+	return bHit;
 }
 
 void APushableObject::HandleInteraction(AChronoQuestCharacter* myCharacter)
@@ -143,8 +184,23 @@ void APushableObject::HandleInteraction(AChronoQuestCharacter* myCharacter)
 
 			//Check for Obstacles and check for clear area to teleport to.
 
-			CheckAreaByCapsuleTracedByChanel(myCharacter);
+			const bool HasEnoughSpaceToPush = CheckAreaByCapsuleTracedByChanel(myCharacter);
+			const bool HasHisSomething = CheckFowardObjectWithLineTraceByChanel(myCharacter);
 
+			bReadyAndGoodToPush = (HasEnoughSpaceToPush && !HasHisSomething);
+
+			if(bReadyAndGoodToPush)
+			{
+				// If on the server, directly set the actor's transform
+				if (HasAuthority())
+				{
+					myCharacter->ServerSetActorTransform(CharacterPushTransform);
+				}
+				else // If on the client, call the server RPC function
+				{
+					myCharacter->ServerSetActorTransform(CharacterPushTransform);
+				}
+			}
 		}
 	}
 }
@@ -153,7 +209,11 @@ void APushableObject::HandleInteraction(AChronoQuestCharacter* myCharacter)
 void APushableObject::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if(HasAuthority())
+	{
+		SetReplicates(true);
+	}
 }
 
 int32 APushableObject::FindClosestPushTransform(FVector2D CharacterCurrentLocation, float PushRange)
@@ -181,6 +241,14 @@ int32 APushableObject::FindClosestPushTransform(FVector2D CharacterCurrentLocati
 		}
 	}
 	return BestIndex;
+}
+
+void APushableObject::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APushableObject, CharacterPushTransform);
+	DOREPLIFETIME(APushableObject, bReadyAndGoodToPush);
 }
 
 // Called every frame

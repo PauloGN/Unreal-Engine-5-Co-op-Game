@@ -113,6 +113,11 @@ void AChronoQuestCharacter::PushingAnimSettings()
 
 }
 
+void AChronoQuestCharacter::ServerSetActorTransform_Implementation(FTransform CharacterPushTransform)
+{
+	SetActorTransform(CharacterPushTransform, false, nullptr, ETeleportType::TeleportPhysics);
+}
+
 void AChronoQuestCharacter::SphereInteraction()
 {
 	// Get a reference to the world
@@ -123,13 +128,13 @@ void AChronoQuestCharacter::SphereInteraction()
     }
 
     // Define the sphere parameters
-	const float HalthZhight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-    FVector SphereLocation = GetActorLocation(); // Assuming you want to check overlap around the character
-	SphereLocation.Z -= HalthZhight;
+	const float HalthZheight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+    FVector SphereLocation = GetActorLocation(); // Check overlap around the character
+	SphereLocation.Z -= HalthZheight;
 
     // Define object types you want to detect overlap with
     FCollisionObjectQueryParams ObjectTypes;
-	ObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_Visibility); // Example: Detect overlap with physics bodies
+	ObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_Visibility); // Example: Detect overlap with Visibility
 	ObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_PhysicsBody); // Example: Detect overlap with physics bodies
 
     // Define response parameters
