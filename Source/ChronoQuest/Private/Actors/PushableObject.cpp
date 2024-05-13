@@ -28,6 +28,11 @@ bool APushableObject::IsBusy()
 	return bIsBeingPushed;
 }
 
+void APushableObject::SetBusy(bool value)
+{
+	bIsBeingPushed = value;
+}
+
 FTransform APushableObject::GetWorldPushTransform(const int32 Index)
 {
 	return PushTransforms[Index] * GetActorTransform();
@@ -159,7 +164,7 @@ bool APushableObject::CheckFowardObjectWithLineTraceByChanel(AChronoQuestCharact
 void APushableObject::HandleInteraction(AChronoQuestCharacter* myCharacter)
 {
 
-	if(!myCharacter)
+	if(!myCharacter || IsBusy())
 	{
 		return;
 	}
@@ -214,7 +219,6 @@ void APushableObject::HandleInteraction(AChronoQuestCharacter* myCharacter)
 
 				//Move
 				CharacterPushComponent->BeginPush(this);
-				bIsBeingPushed = true;
 			}
 		}
 	}

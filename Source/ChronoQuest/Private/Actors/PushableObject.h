@@ -41,6 +41,7 @@ public:
 	TArray<FTransform>  PushTransforms;
 
 	bool IsBusy();
+	void SetBusy(bool value);
 
 private:
 
@@ -48,7 +49,6 @@ private:
 	FTransform GetWorldPushTransform(const int32 Index);
 
 	//Variable saves the position that character should be alined to in order to push the object avoiding weird position.
-	//UPROPERTY(Replicated)
 	FTransform CharacterPushTransform;
 
 	UPROPERTY(Replicated)

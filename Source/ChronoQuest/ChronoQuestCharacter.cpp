@@ -280,7 +280,7 @@ void AChronoQuestCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 		
 		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AChronoQuestCharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Moving
@@ -300,6 +300,13 @@ void AChronoQuestCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 void AChronoQuestCharacter::Move(const FInputActionValue& Value)
 {
+	//Assert Push component
+	check(PushComponent)
+	if (PushComponent->IsPushing())
+	{
+		return;
+	}
+
 	// input is a Vector2D
 	MovementVector = Value.Get<FVector2D>();
 
@@ -334,11 +341,22 @@ void AChronoQuestCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void AChronoQuestCharacter::Jump()
+{
+	//Assert Push component
+	check(PushComponent)
+	if (PushComponent->IsPushing())
+	{
+		return;
+	}
+
+	Super::Jump();
+}
+
 void AChronoQuestCharacter::IA_Interaction(const FInputActionValue& Value)
 {
 	//Assert Push component
 	check(PushComponent)
-
 	if(PushComponent->IsPushing())
 	{
 		PushComponent->EndPush();

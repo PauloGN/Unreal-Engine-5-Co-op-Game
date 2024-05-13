@@ -45,10 +45,21 @@ void UPushComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	{
 		const FVector ForwardVector = GetOwner()->GetActorForwardVector();
 
-		FVector NewLocation = ForwardVector * DeltaTime * PushSpeed;
+		const FVector NewLocation = ForwardVector * DeltaTime * PushSpeed;
 
-		CurrentPushable->AddActorWorldOffset(NewLocation, true);
+		FHitResult HitResult;
+		CurrentPushable->K2_AddActorWorldOffset(NewLocation, true, HitResult, false);
 
+		if (HitResult.bBlockingHit)
+		{
+			// Object hit something
+			// You can access information about the hit from the HitResult object
+			// For example:
+			FVector HitLocation = HitResult.Location;
+			AActor* HitActor = HitResult.GetActor();
+			// Handle the hit as needed
+			EndPush();
+		}
 	}
 
 }
@@ -59,10 +70,10 @@ void UPushComponent::PushingLogic(APushableObject* PushableObject)
 	{
 		return;
 	}
-
 	//Set Current Pushable object being used
 	AChronoQuestCharacter* myCharacter = Cast<AChronoQuestCharacter>(GetOwner());
 	CurrentPushable = PushableObject;
+	CurrentPushable->SetBusy(true);
 	
 	//Set attachment 
 	FAttachmentTransformRules AttachmentTransformRules(EAttachmentRule::KeepWorld, true);
@@ -98,6 +109,7 @@ void UPushComponent::EndPushingLogic()
 
 	SetComponentTickEnabled(false);
 
+	CurrentPushable->SetBusy(false);
 	CurrentPushable = nullptr;
 }
 
