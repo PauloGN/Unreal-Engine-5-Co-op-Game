@@ -17,15 +17,21 @@ public:
 	// Sets default values for this component's properties
 	UPushComponent();
 
+	UPROPERTY(Replicated)
 	TObjectPtr<APushableObject> CurrentPushable;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
+
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	void PushingLogic(APushableObject* PushableObject);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pushing Set up")
 	float PushSpeed = 50.0f;
@@ -33,6 +39,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pushing Set up")
 	float PushRange = 100.0f;
 
+	UFUNCTION(Server, Reliable)
+	void ServerRPCPushingLogicCall(APushableObject* PushableObject);
 
 	UFUNCTION()
 	void BeginPush(APushableObject* PushableObject);

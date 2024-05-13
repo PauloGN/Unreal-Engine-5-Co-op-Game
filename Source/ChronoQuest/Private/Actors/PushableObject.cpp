@@ -224,6 +224,7 @@ void APushableObject::BeginPlay()
 	if(HasAuthority())
 	{
 		SetReplicates(true);
+		SetReplicateMovement(true);
 	}
 }
 

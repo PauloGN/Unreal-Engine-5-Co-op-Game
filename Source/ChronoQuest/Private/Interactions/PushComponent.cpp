@@ -6,6 +6,7 @@
 #include "Actors/PushableObject.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values for this component's properties
 UPushComponent::UPushComponent()
@@ -24,6 +25,12 @@ void UPushComponent::BeginPlay()
 
 	// ...
 	SetComponentTickEnabled(false);
+}
+
+void UPushComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(UPushComponent, CurrentPushable);
 }
 
 // Called every frame
@@ -46,9 +53,8 @@ void UPushComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 }
 
-void UPushComponent::BeginPush(APushableObject* PushableObject)
+void UPushComponent::PushingLogic(APushableObject* PushableObject)
 {
-
 	if(CurrentPushable)
 	{
 		return;
@@ -57,7 +63,7 @@ void UPushComponent::BeginPush(APushableObject* PushableObject)
 	//Set Current Pushable object being used
 	AChronoQuestCharacter* myCharacter = Cast<AChronoQuestCharacter>(GetOwner());
 	CurrentPushable = PushableObject;
-
+	
 	//Set attachment 
 	FAttachmentTransformRules AttachmentTransformRules(EAttachmentRule::KeepWorld, true);
 	AttachmentTransformRules.bWeldSimulatedBodies = true;
@@ -69,7 +75,22 @@ void UPushComponent::BeginPush(APushableObject* PushableObject)
 	myCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 
 	SetComponentTickEnabled(true);
+}
 
+void UPushComponent::ServerRPCPushingLogicCall_Implementation(APushableObject* PushableObject)
+{
+	PushingLogic(PushableObject);
+}
+
+void UPushComponent::BeginPush(APushableObject* PushableObject)
+{
+	if(GetOwner()->HasAuthority())
+	{
+		PushingLogic(PushableObject);
+		return;
+	}
+
+	ServerRPCPushingLogicCall(PushableObject);
 }
 
 void UPushComponent::EndPush()
