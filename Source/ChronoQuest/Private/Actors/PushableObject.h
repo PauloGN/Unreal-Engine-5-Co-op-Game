@@ -7,7 +7,6 @@
 #include "Interactions/InteractInterface.h"
 #include "PushableObject.generated.h"
 
-
 UCLASS()
 class APushableObject : public AActor, public IInteractInterface
 {
@@ -47,13 +46,17 @@ private:
 	FTransform GetWorldPushTransform(const int32 Index);
 
 	//Variable saves the position that character should be alined to in order to push the object avoiding weird position.
-	UPROPERTY(Replicated)
+	//UPROPERTY(Replicated)
 	FTransform CharacterPushTransform;
 
 	UPROPERTY(Replicated)
 	bool bReadyAndGoodToPush;
 
+	//Trace scan
 	bool CheckAreaByCapsuleTracedByChanel(AChronoQuestCharacter* myCharacter);
-
 	bool CheckFowardObjectWithLineTraceByChanel(AChronoQuestCharacter* myCharacter);
+
+
+	// Declare a timer handle to manage the timer
+	FTimerHandle CharacterTransformTimerHandle;
 };

@@ -50,6 +50,8 @@ class AChronoQuestCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* Interaction;
 
+
+
 public:
 	AChronoQuestCharacter();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -98,6 +100,7 @@ public:
 	////////////////////////// Pushable Objects
 
 	/**Search and interaction/radius range*/
+
 	float PushRange;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interactions")
@@ -105,6 +108,9 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerSetActorTransform(FTransform CharacterPushTransform);
+
+	UFUNCTION()
+	void ClientSetActorTransform(FTransform CharacterPushTransform);
 
 private:
 
@@ -150,4 +156,5 @@ private:
 
 	UPROPERTY(Replicated, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	bool bStartAction;
+
 };

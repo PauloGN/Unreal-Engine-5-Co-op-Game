@@ -32,4 +32,11 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pushing Set up")
 	float PushRange = 100.0f;
+
+
+	UFUNCTION()
+	void BeginPush(APushableObject* PushableObject);
+
+	UFUNCTION()
+	void EndPush();
 };

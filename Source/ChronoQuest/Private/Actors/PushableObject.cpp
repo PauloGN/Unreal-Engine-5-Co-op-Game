@@ -1,8 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Actors/PushableObject.h"
-
 #include "ChronoQuest/ChronoQuestCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -189,17 +187,30 @@ void APushableObject::HandleInteraction(AChronoQuestCharacter* myCharacter)
 
 			bReadyAndGoodToPush = (HasEnoughSpaceToPush && !HasHisSomething);
 
-			if(bReadyAndGoodToPush)
+			if (bReadyAndGoodToPush)
 			{
+				bReadyAndGoodToPush = false;
+
 				// If on the server, directly set the actor's transform
 				if (HasAuthority())
 				{
-					myCharacter->ServerSetActorTransform(CharacterPushTransform);
+					myCharacter->SetActorTransform(CharacterPushTransform, false, nullptr, ETeleportType::TeleportPhysics);
 				}
 				else // If on the client, call the server RPC function
 				{
 					myCharacter->ServerSetActorTransform(CharacterPushTransform);
+
+					if (myCharacter->IsLocallyControlled())
+					{
+						// Update the character's transform locally
+						myCharacter->SetActorTransform(CharacterPushTransform, false, nullptr, ETeleportType::TeleportPhysics);
+					}
 				}
+
+				//Move
+				CharacterPushComponent->BeginPush(this);
+
+
 			}
 		}
 	}
@@ -247,7 +258,7 @@ void APushableObject::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(APushableObject, CharacterPushTransform);
+	//DOREPLIFETIME(APushableObject, CharacterPushTransform);
 	DOREPLIFETIME(APushableObject, bReadyAndGoodToPush);
 }
 

@@ -11,13 +11,13 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Net/UnrealNetwork.h"
-#include <Engine/StaticMeshActor.h>
+//#include <Engine/StaticMeshActor.h>
 
-#include "Actors/PushableActor.h"
+//#include "Actors/PushableActor.h"
 #include "Components/WidgetComponent.h"
 #include "Interactions/InteractInterface.h"
 #include "Interactions/PushComponent.h"
-#include "Kismet/GameplayStatics.h"
+//#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -63,9 +63,6 @@ AChronoQuestCharacter::AChronoQuestCharacter()
 
 	overHeadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PlayerName"));
 	overHeadWidget->SetupAttachment(RootComponent);
-
-	GetCharacterMovement()->SetIsReplicated(true);
-	GetCharacterMovement()->ForceReplicationUpdate();
 
 #pragma region PUSH
 
@@ -114,6 +111,11 @@ void AChronoQuestCharacter::PushingAnimSettings()
 }
 
 void AChronoQuestCharacter::ServerSetActorTransform_Implementation(FTransform CharacterPushTransform)
+{
+	SetActorTransform(CharacterPushTransform, false);
+}
+
+void AChronoQuestCharacter::ClientSetActorTransform(FTransform CharacterPushTransform)
 {
 	SetActorTransform(CharacterPushTransform, false, nullptr, ETeleportType::TeleportPhysics);
 }
