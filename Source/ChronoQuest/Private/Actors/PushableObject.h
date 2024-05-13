@@ -40,6 +40,8 @@ public:
 	UPROPERTY(BlueprintReadonly, EditInstanceOnly, meta = (MakeEditWidget = "true"))
 	TArray<FTransform>  PushTransforms;
 
+	bool IsBusy();
+
 private:
 
 	//Gets the world transform of an specific PushTransform by its index 
@@ -52,10 +54,12 @@ private:
 	UPROPERTY(Replicated)
 	bool bReadyAndGoodToPush;
 
+	UPROPERTY(Replicated)
+	bool bIsBeingPushed;
+
 	//Trace scan
 	bool CheckAreaByCapsuleTracedByChanel(AChronoQuestCharacter* myCharacter);
 	bool CheckFowardObjectWithLineTraceByChanel(AChronoQuestCharacter* myCharacter);
-
 
 	// Declare a timer handle to manage the timer
 	FTimerHandle CharacterTransformTimerHandle;

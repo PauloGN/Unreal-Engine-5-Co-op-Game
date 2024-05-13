@@ -77,9 +77,38 @@ void UPushComponent::PushingLogic(APushableObject* PushableObject)
 	SetComponentTickEnabled(true);
 }
 
+void UPushComponent::EndPushingLogic()
+{
+	if (!CurrentPushable)
+	{
+		return;
+	}
+
+	//Get Component owner 
+	AChronoQuestCharacter* myCharacter = Cast<AChronoQuestCharacter>(GetOwner());
+
+	//Set Detach from 
+	FDetachmentTransformRules DetachmentTransform(EDetachmentRule::KeepWorld, true);
+	myCharacter->DetachFromActor(DetachmentTransform);
+
+	//Constraint character movements
+	myCharacter->GetMovementComponent()->SetPlaneConstraintEnabled(false);
+	//myCharacter->GetMovementComponent()->SetPlaneConstraintNormal(myCharacter->GetActorRightVector());
+	myCharacter->GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	SetComponentTickEnabled(false);
+
+	CurrentPushable = nullptr;
+}
+
 void UPushComponent::ServerRPCPushingLogicCall_Implementation(APushableObject* PushableObject)
 {
 	PushingLogic(PushableObject);
+}
+
+void UPushComponent::ServerRPCEndPushingLogicCall_Implementation()
+{
+	EndPushingLogic();
 }
 
 void UPushComponent::BeginPush(APushableObject* PushableObject)
@@ -95,5 +124,17 @@ void UPushComponent::BeginPush(APushableObject* PushableObject)
 
 void UPushComponent::EndPush()
 {
+	if (GetOwner()->HasAuthority())
+	{
+		EndPushingLogic();
+		return;
+	}
+
+	ServerRPCEndPushingLogicCall();
+}
+
+bool UPushComponent::IsPushing()
+{
+	return static_cast<bool>(CurrentPushable);
 }
 

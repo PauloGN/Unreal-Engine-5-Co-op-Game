@@ -79,6 +79,7 @@ void AChronoQuestCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(AChronoQuestCharacter, bStartAction);
 	DOREPLIFETIME(AChronoQuestCharacter, bIsInteracting);
 	DOREPLIFETIME(AChronoQuestCharacter, bCanPushObj);
+	DOREPLIFETIME(AChronoQuestCharacter, PushComponent);
 }
 
 void AChronoQuestCharacter::BeginPlay()
@@ -335,6 +336,15 @@ void AChronoQuestCharacter::Look(const FInputActionValue& Value)
 
 void AChronoQuestCharacter::IA_Interaction(const FInputActionValue& Value)
 {
+	//Assert Push component
+	check(PushComponent)
+
+	if(PushComponent->IsPushing())
+	{
+		PushComponent->EndPush();
+		return;
+	}
+
 
 	SphereInteraction();
 

@@ -23,6 +23,11 @@ APushableObject::APushableObject()
 	Mesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 }
 
+bool APushableObject::IsBusy()
+{
+	return bIsBeingPushed;
+}
+
 FTransform APushableObject::GetWorldPushTransform(const int32 Index)
 {
 	return PushTransforms[Index] * GetActorTransform();
@@ -209,8 +214,7 @@ void APushableObject::HandleInteraction(AChronoQuestCharacter* myCharacter)
 
 				//Move
 				CharacterPushComponent->BeginPush(this);
-
-
+				bIsBeingPushed = true;
 			}
 		}
 	}
@@ -259,7 +263,7 @@ void APushableObject::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	//DOREPLIFETIME(APushableObject, CharacterPushTransform);
+	DOREPLIFETIME(APushableObject, bIsBeingPushed);
 	DOREPLIFETIME(APushableObject, bReadyAndGoodToPush);
 }
 
