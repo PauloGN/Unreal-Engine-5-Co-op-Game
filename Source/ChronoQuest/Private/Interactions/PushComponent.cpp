@@ -3,7 +3,9 @@
 #include "Interactions/PushComponent.h"
 #include <ChronoQuest/ChronoQuestCharacter.h>
 
+#include "Actors/CPP_TriggerPlatform.h"
 #include "Actors/PushableObject.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -56,9 +58,13 @@ void UPushComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 			// You can access information about the hit from the HitResult object
 			// For example:
 			FVector HitLocation = HitResult.Location;
-			AActor* HitActor = HitResult.GetActor();
+			AActor* HitActor = Cast<ACPP_TriggerPlatform>(HitResult.GetActor());
 			// Handle the hit as needed
-			EndPush();
+
+			if(!HitActor)
+			{
+				EndPush();
+			}
 		}
 	}
 
@@ -148,5 +154,28 @@ void UPushComponent::EndPush()
 bool UPushComponent::IsPushing()
 {
 	return static_cast<bool>(CurrentPushable);
+}
+
+float UPushComponent::GetPushableObjectHeight()
+{
+
+	if(!CurrentPushable)
+	{
+		return 0;
+	}
+
+	FVector Min;
+	FVector Max;
+
+	CurrentPushable->GetMesh()->GetLocalBounds(Min, Max);
+
+	const float TopOfTheObject = (Max.Z - Min.Z) + CurrentPushable->GetActorLocation().Z;
+
+	AChronoQuestCharacter* myCharacter = Cast<AChronoQuestCharacter>(GetOwner());
+
+	const float CharacterFeet = myCharacter->GetActorLocation().Z - myCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
+	return (TopOfTheObject - CharacterFeet);
+
 }
 

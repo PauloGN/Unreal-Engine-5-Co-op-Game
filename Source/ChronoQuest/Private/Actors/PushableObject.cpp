@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Actors/PushableObject.h"
+
+#include "CPP_TriggerPlatform.h"
 #include "ChronoQuest/ChronoQuestCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -31,6 +33,11 @@ bool APushableObject::IsBusy()
 void APushableObject::SetBusy(bool value)
 {
 	bIsBeingPushed = value;
+}
+
+UStaticMeshComponent* APushableObject::GetMesh() const
+{
+	return Mesh;
 }
 
 FTransform APushableObject::GetWorldPushTransform(const int32 Index)
@@ -143,11 +150,11 @@ bool APushableObject::CheckFowardObjectWithLineTraceByChanel(AChronoQuestCharact
 
 	if (bHit)
 	{
-		// If we hit something, do something with the hit result
-		AActor* HitActor = HitResult.GetActor();
+		AActor* HitActor = Cast<ACPP_TriggerPlatform>(HitResult.GetActor());
 		if (HitActor)
 		{
-			// Do something with the hit actor
+			GEngine->AddOnScreenDebugMessage(33, 1.0f, FColor::Green, "Trigger");
+			return false;// Do something with the hit actor
 		}
 
 		// Draw debug line for visualization
@@ -187,6 +194,8 @@ void APushableObject::HandleInteraction(AChronoQuestCharacter* myCharacter)
 			const float ZOffset = myCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 
 			CharacterPushTransform.SetLocation({ WorldTransform.GetLocation().X, WorldTransform.GetLocation().Y, WorldTransform.GetLocation().Z + ZOffset });
+
+			CharacterPushTransform.SetScale3D(myCharacter->GetActorScale3D());
 
 			DrawDebugSphere(GetWorld(), CharacterPushTransform.GetLocation(), 30, 10, FColor::Purple, false, 5.0f, 0, 3.0f);
 

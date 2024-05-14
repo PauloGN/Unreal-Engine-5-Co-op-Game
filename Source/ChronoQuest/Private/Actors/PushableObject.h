@@ -43,6 +43,8 @@ public:
 	bool IsBusy();
 	void SetBusy(bool value);
 
+	UStaticMeshComponent* GetMesh() const;
+
 private:
 
 	//Gets the world transform of an specific PushTransform by its index 

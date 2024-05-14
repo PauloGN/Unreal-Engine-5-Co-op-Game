@@ -53,4 +53,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsPushing();
+
+	UFUNCTION(BlueprintCallable)
+	float GetPushableObjectHeight();
+
 };
