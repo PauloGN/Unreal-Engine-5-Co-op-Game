@@ -104,7 +104,7 @@ public:
 
 	float PushRange;
 
-	UPROPERTY(replicated, EditAnywhere, Category = "Interactions")
+	UPROPERTY(replicated, EditAnywhere, BlueprintReadOnly, Category = "Interactions")
 	UPushComponent* PushComponent;
 
 	UFUNCTION(Server, Reliable)

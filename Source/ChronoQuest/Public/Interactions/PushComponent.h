@@ -51,5 +51,6 @@ public:
 	UFUNCTION()
 	void EndPush();
 
+	UFUNCTION(BlueprintCallable)
 	bool IsPushing();
 };
