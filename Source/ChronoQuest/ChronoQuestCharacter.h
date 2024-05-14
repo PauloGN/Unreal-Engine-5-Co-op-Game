@@ -11,7 +11,6 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
-class APushableActor;
 class UPushComponent;
 struct FInputActionValue;
 
@@ -72,7 +71,7 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	// To add mapping context
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
 
 public:
 	/** Returns CameraBoom subObject **/
@@ -84,24 +83,8 @@ public:
 
 #pragma region PUSHING
 
-	UPROPERTY(Replicated, BlueprintReadWrite) bool bIsInteracting = false;
-	UPROPERTY(Replicated, BlueprintReadWrite) bool bCanPushObj = false;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) float SprintSpeed = 600.0f;
-	UPROPERTY(EditAnywhere ,BlueprintReadWrite) float WalkSpeed = 100.0f;
-	
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_Walk(const float speed);
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) FVector2D MovementVector;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) TObjectPtr<APushableActor> PushableActor;
-	
-	UFUNCTION()
-	void PushingAnimSettings();
-
 	////////////////////////// Pushable Objects
-
 	/**Search and interaction/radius range*/
-
 	float PushRange;
 
 	UPROPERTY(replicated, EditAnywhere, BlueprintReadOnly, Category = "Interactions")
@@ -157,5 +140,4 @@ private:
 
 	UPROPERTY(Replicated, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	bool bStartAction;
-
 };

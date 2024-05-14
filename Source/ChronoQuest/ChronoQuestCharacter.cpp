@@ -77,8 +77,6 @@ void AChronoQuestCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AChronoQuestCharacter, bStartAction);
-	DOREPLIFETIME(AChronoQuestCharacter, bIsInteracting);
-	DOREPLIFETIME(AChronoQuestCharacter, bCanPushObj);
 	DOREPLIFETIME(AChronoQuestCharacter, PushComponent);
 }
 
@@ -101,13 +99,6 @@ void AChronoQuestCharacter::BeginPlay()
 void AChronoQuestCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-}
-
-void AChronoQuestCharacter::PushingAnimSettings()
-{
-
-
 
 }
 
@@ -174,29 +165,6 @@ void AChronoQuestCharacter::SphereInteraction()
     }
 
 	DrawDebugSphere(GetWorld(), SphereLocation, PushRange, 36, FColor::Green, false, 2.0f);
-}
-
-void AChronoQuestCharacter::ServerRPC_Walk_Implementation(const float speed)
-{
-	GetCharacterMovement()->MaxWalkSpeed = speed;
-	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, "WALK Speed Called");
-
-	if(speed == WalkSpeed)
-	{
-		bIsInteracting = true;
-
-		if (PushableActor)
-		{
-			//PushableActor->Mesh->SetSimulatePhysics(true);
-		}
-	}else
-	{
-		bIsInteracting = false;
-		if (PushableActor)
-		{
-			//PushableActor->Mesh->SetSimulatePhysics(false);
-		}
-	}
 }
 
 #pragma region RPC
@@ -308,7 +276,7 @@ void AChronoQuestCharacter::Move(const FInputActionValue& Value)
 	}
 
 	// input is a Vector2D
-	MovementVector = Value.Get<FVector2D>();
+	const FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
@@ -362,33 +330,6 @@ void AChronoQuestCharacter::IA_Interaction(const FInputActionValue& Value)
 		PushComponent->EndPush();
 		return;
 	}
-
-
+	
 	SphereInteraction();
-
-	if(bCanPushObj)
-	{
-		if(bIsInteracting)
-		{
-			GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-			ServerRPC_Walk(SprintSpeed);
-			bIsInteracting = false;
-
-			if(PushableActor)
-			{
-				//PushableActor->Mesh->SetSimulatePhysics(false);
-			}
-		}
-		else
-		{
-			GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-			ServerRPC_Walk(WalkSpeed);
-			bIsInteracting = true;
-
-			if (PushableActor)
-			{
-				//PushableActor->Mesh->SetSimulatePhysics(true);
-			}
-		}
-	}
 }

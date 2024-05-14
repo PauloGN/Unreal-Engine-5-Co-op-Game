@@ -45,7 +45,7 @@ FTransform APushableObject::GetWorldPushTransform(const int32 Index)
 	return PushTransforms[Index] * GetActorTransform();
 }
 
-bool APushableObject::CheckAreaByCapsuleTracedByChanel(AChronoQuestCharacter* myCharacter)
+bool APushableObject::CheckAreaByCapsuleTracedByChanel(AChronoQuestCharacter* myCharacter) const
 {
 
 	bool CanPush = false;
@@ -126,7 +126,7 @@ bool APushableObject::CheckAreaByCapsuleTracedByChanel(AChronoQuestCharacter* my
 	return CanPush;
 }
 
-bool APushableObject::CheckFowardObjectWithLineTraceByChanel(AChronoQuestCharacter* myCharacter)
+bool APushableObject::CheckFowardObjectWithLineTraceByChanel(AChronoQuestCharacter* myCharacter) const
 {
 	FVector StartLocation = GetActorLocation(); // Start location of the trace
 	FVector EndLocation = CharacterPushTransform.GetLocation(); // End location of the trace
@@ -150,8 +150,7 @@ bool APushableObject::CheckFowardObjectWithLineTraceByChanel(AChronoQuestCharact
 
 	if (bHit)
 	{
-		AActor* HitActor = Cast<ACPP_TriggerPlatform>(HitResult.GetActor());
-		if (HitActor)
+		if (AActor* HitActor = Cast<ACPP_TriggerPlatform>(HitResult.GetActor()))
 		{
 			GEngine->AddOnScreenDebugMessage(33, 1.0f, FColor::Green, "Trigger");
 			return false;// Do something with the hit actor
@@ -176,12 +175,10 @@ void APushableObject::HandleInteraction(AChronoQuestCharacter* myCharacter)
 		return;
 	}
 
-	FTransform MyCharacterTransform = myCharacter->GetActorTransform();
-	FVector2D MyCharacterGroundLocation(MyCharacterTransform.GetLocation().X, MyCharacterTransform.GetLocation().Y);
-	
-	UPushComponent* CharacterPushComponent =  Cast<UPushComponent>(myCharacter->GetComponentByClass(UPushComponent::StaticClass()));
+	const FTransform MyCharacterTransform = myCharacter->GetActorTransform();
+	const FVector2D MyCharacterGroundLocation(MyCharacterTransform.GetLocation().X, MyCharacterTransform.GetLocation().Y);
 
-	if(CharacterPushComponent)
+	if(UPushComponent* CharacterPushComponent =  Cast<UPushComponent>(myCharacter->GetComponentByClass(UPushComponent::StaticClass())))
 	{
 		//Calculates the nearest pushTransform for character interact with
 		const int32 BestIndex = FindClosestPushTransform(MyCharacterGroundLocation, CharacterPushComponent->PushRange);
@@ -293,4 +290,3 @@ void APushableObject::OnInteracted(AChronoQuestCharacter* myCharacter)
 
 	HandleInteraction(myCharacter);
 }
-
