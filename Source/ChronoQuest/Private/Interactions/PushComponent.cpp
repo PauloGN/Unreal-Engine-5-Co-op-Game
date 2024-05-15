@@ -55,19 +55,18 @@ void UPushComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 		if (HitResult.bBlockingHit)
 		{
 			// Object hit something
-			// You can access information about the hit from the HitResult object
+			// access information about the hit from the HitResult object
 			// For example:
-			FVector HitLocation = HitResult.Location;
-			AActor* HitActor = Cast<ACPP_TriggerPlatform>(HitResult.GetActor());
-			// Handle the hit as needed
+			//** FVector HitLocation = HitResult.Location; */
 
+			// Handle the hit for TriggerPlatform>
+			AActor* HitActor = Cast<ACPP_TriggerPlatform>(HitResult.GetActor());
 			if(!HitActor)
 			{
 				EndPush();
 			}
 		}
 	}
-
 }
 
 void UPushComponent::PushingLogic(APushableObject* PushableObject)
@@ -158,7 +157,6 @@ bool UPushComponent::IsPushing()
 
 float UPushComponent::GetPushableObjectHeight()
 {
-
 	if(!CurrentPushable)
 	{
 		return 0;
@@ -176,5 +174,4 @@ float UPushComponent::GetPushableObjectHeight()
 	const float CharacterFeet = myCharacter->GetActorLocation().Z - myCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 
 	return (TopOfTheObject - CharacterFeet);
-
 }

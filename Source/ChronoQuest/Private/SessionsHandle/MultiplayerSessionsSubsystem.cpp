@@ -140,7 +140,7 @@ void UMultiplayerSessionsSubsystem::DestroyLastServer()
 
 void UMultiplayerSessionsSubsystem::SetMapIndex(const int index)
 {
-	if(index < 0 || index < gameMapsName.Num())
+	if(index < 0 || index > gameMapsName.Num())
 	{
 		mapIndex = 0;
 		return;

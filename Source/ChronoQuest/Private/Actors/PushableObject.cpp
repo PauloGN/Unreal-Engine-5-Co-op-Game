@@ -169,7 +169,6 @@ bool APushableObject::CheckFowardObjectWithLineTraceByChanel(AChronoQuestCharact
 
 void APushableObject::HandleInteraction(AChronoQuestCharacter* myCharacter)
 {
-
 	if(!myCharacter || IsBusy())
 	{
 		return;
