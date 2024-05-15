@@ -23,9 +23,10 @@ void UMultiplayerSessionsSubsystem::Initialize(FSubsystemCollectionBase& Collect
 
 	IOnlineSubsystem* onlineSubsystem = IOnlineSubsystem::Get();
 
-	gameMapsName.Add("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");
-	gameMapsName.Add("/Game/ThirdPerson/Maps/Chapter01?listen");
-	gameMapsName.Add("/Game/ThirdPerson/Maps/Lobby?listen");
+	gameMapsName.Add("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");	//0
+	gameMapsName.Add("/Game/ThirdPerson/Maps/Chapter01?listen");		//1
+	gameMapsName.Add("/Game/ThirdPerson/Maps/Lobby?listen");			//2
+	gameMapsName.Add("/Game/ThirdPerson/Maps/PauloSandBox?listen");		//3
 
 	if(onlineSubsystem)
 	{
