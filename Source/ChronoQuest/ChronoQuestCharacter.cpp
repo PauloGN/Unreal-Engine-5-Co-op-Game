@@ -11,10 +11,13 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Net/UnrealNetwork.h"
-#include <Engine/StaticMeshActor.h>
+//#include <Engine/StaticMeshActor.h>
 
+//#include "Actors/PushableActor.h"
 #include "Components/WidgetComponent.h"
-#include "Kismet/GameplayStatics.h"
+#include "Interactions/InteractInterface.h"
+#include "Interactions/PushComponent.h"
+//#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -60,6 +63,13 @@ AChronoQuestCharacter::AChronoQuestCharacter()
 
 	overHeadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PlayerName"));
 	overHeadWidget->SetupAttachment(RootComponent);
+
+#pragma region PUSH
+
+	PushComponent = CreateDefaultSubobject<UPushComponent>("PushComponent");
+
+#pragma endregion
+
 }
 
 void AChronoQuestCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -67,7 +77,7 @@ void AChronoQuestCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AChronoQuestCharacter, bStartAction);
-
+	DOREPLIFETIME(AChronoQuestCharacter, PushComponent);
 }
 
 void AChronoQuestCharacter::BeginPlay()
@@ -81,8 +91,80 @@ void AChronoQuestCharacter::BeginPlay()
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			PushRange = PushComponent->PushRange;
 		}
 	}
+}
+
+void AChronoQuestCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+}
+
+void AChronoQuestCharacter::ServerSetActorTransform_Implementation(FTransform CharacterPushTransform)
+{
+	SetActorTransform(CharacterPushTransform, false);
+}
+
+void AChronoQuestCharacter::ClientSetActorTransform(FTransform CharacterPushTransform)
+{
+	SetActorTransform(CharacterPushTransform, false, nullptr, ETeleportType::TeleportPhysics);
+}
+
+void AChronoQuestCharacter::SphereInteraction()
+{
+	// Get a reference to the world
+    UWorld* World = GetWorld();
+    if (!World)
+    {
+        return;
+    }
+
+    // Define the sphere parameters
+	const float HalthZheight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+    FVector SphereLocation = GetActorLocation(); // Check overlap around the character
+	SphereLocation.Z -= HalthZheight;
+
+    // Define object types you want to detect overlap with
+    FCollisionObjectQueryParams ObjectTypes;
+	ObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_Visibility); // Example: Detect overlap with Visibility
+	ObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_PhysicsBody); // Example: Detect overlap with physics bodies
+
+    // Define response parameters
+    FCollisionQueryParams CollisionParams;
+    CollisionParams.bReturnPhysicalMaterial = false; // Optionally return physical material
+
+    // Perform the overlap check
+    TArray<FOverlapResult> OverlapResults;
+    World->OverlapMultiByObjectType(
+        OverlapResults,
+        SphereLocation,
+        FQuat::Identity,
+        ObjectTypes,
+        FCollisionShape::MakeSphere(PushRange),
+        CollisionParams
+    );
+
+    // Process overlap results
+    for (const FOverlapResult& OverlapResult : OverlapResults)
+    {
+        AActor* OverlappingActor = OverlapResult.GetActor();
+        // Check if the overlapping actor implements a specific interface
+        if (OverlappingActor->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
+        {
+            // Cast to the interface
+			IInteractInterface* YourInterface = Cast<IInteractInterface>(OverlappingActor);
+            if (YourInterface)
+            {
+                // Call interface function
+                YourInterface->OnInteracted(this);
+				break;
+            }
+        }
+    }
+
+	DrawDebugSphere(GetWorld(), SphereLocation, PushRange, 36, FColor::Green, false, 2.0f);
 }
 
 #pragma region RPC
@@ -166,7 +248,7 @@ void AChronoQuestCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 		
 		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AChronoQuestCharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Moving
@@ -174,6 +256,9 @@ void AChronoQuestCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AChronoQuestCharacter::Look);
+
+		// Interaction
+		EnhancedInputComponent->BindAction(Interaction, ETriggerEvent::Triggered, this, &AChronoQuestCharacter::IA_Interaction);
 	}
 	else
 	{
@@ -183,8 +268,15 @@ void AChronoQuestCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 void AChronoQuestCharacter::Move(const FInputActionValue& Value)
 {
+	//Assert Push component
+	check(PushComponent)
+	if (PushComponent->IsPushing())
+	{
+		return;
+	}
+
 	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
+	const FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
@@ -215,4 +307,29 @@ void AChronoQuestCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AChronoQuestCharacter::Jump()
+{
+	//Assert Push component
+	check(PushComponent)
+	if (PushComponent->IsPushing())
+	{
+		return;
+	}
+
+	Super::Jump();
+}
+
+void AChronoQuestCharacter::IA_Interaction(const FInputActionValue& Value)
+{
+	//Assert Push component
+	check(PushComponent)
+	if(PushComponent->IsPushing())
+	{
+		PushComponent->EndPush();
+		return;
+	}
+	
+	SphereInteraction();
 }

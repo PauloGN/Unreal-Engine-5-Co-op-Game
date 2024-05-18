@@ -11,6 +11,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
+class UPushComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -44,6 +45,10 @@ class AChronoQuestCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	/** Interaction Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* Interaction;
+
 public:
 	AChronoQuestCharacter();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -55,20 +60,47 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-			
 
-protected:
+	/** Called for Jump input */
+	virtual  void Jump () override;
+
+	/** Called for Interaction input */
+	void IA_Interaction(const FInputActionValue& Value);
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	// To add mapping context
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
 
 public:
-	/** Returns CameraBoom subobject **/
+	/** Returns CameraBoom subObject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	/** Returns FollowCamera subobject **/
+	/** Returns FollowCamera subObject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	virtual void Tick(float DeltaSeconds) override;
+
+#pragma region PUSHING
+
+	////////////////////////// Pushable Objects
+	/**Search and interaction/radius range*/
+	float PushRange;
+
+	UPROPERTY(replicated, EditAnywhere, BlueprintReadOnly, Category = "Interactions")
+	UPushComponent* PushComponent;
+
+	UFUNCTION(Server, Reliable)
+	void ServerSetActorTransform(FTransform CharacterPushTransform);
+
+	UFUNCTION()
+	void ClientSetActorTransform(FTransform CharacterPushTransform);
+
+private:
+
+	void SphereInteraction();
+
+#pragma endregion
 
 #pragma region RPC
 
@@ -109,4 +141,3 @@ private:
 	UPROPERTY(Replicated, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	bool bStartAction;
 };
-
