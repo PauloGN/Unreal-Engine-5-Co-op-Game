@@ -40,9 +40,7 @@ void UPushComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	GEngine->AddOnScreenDebugMessage(13333, 1.f, FColor::Blue, "Go");
 	// ...
-
 	if (CurrentPushable)
 	{
 		const FVector ForwardVector = GetOwner()->GetActorForwardVector();
@@ -50,7 +48,10 @@ void UPushComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 		const FVector NewLocation = ForwardVector * DeltaTime * PushSpeed;
 
 		FHitResult HitResult;
-		CurrentPushable->K2_AddActorWorldOffset(NewLocation, true, HitResult, false);
+		if(CurrentPushable->HasAuthority())
+		{
+			CurrentPushable->K2_AddActorWorldOffset(NewLocation, true, HitResult, false);
+		}
 
 		if (HitResult.bBlockingHit)
 		{

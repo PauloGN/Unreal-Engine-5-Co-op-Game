@@ -167,6 +167,21 @@ void AChronoQuestCharacter::SphereInteraction()
 	DrawDebugSphere(GetWorld(), SphereLocation, PushRange, 36, FColor::Green, false, 2.0f);
 }
 
+void AChronoQuestCharacter::SERVERRPC_SetWalkSpeed_Implementation(const float Speed)
+{
+	SetSpeed(Speed);
+}
+
+bool AChronoQuestCharacter::SERVERRPC_SetWalkSpeed_Validate(const float Speed)
+{
+	return (Speed > 0 && Speed < 800);
+}
+
+void AChronoQuestCharacter::SetSpeed(const float Speed)
+{
+	GetCharacterMovement()->MaxWalkSpeed = Speed;
+}
+
 #pragma region RPC
 
 //void AChronoQuestCharacter::SpawnSphere()
@@ -189,8 +204,8 @@ void AChronoQuestCharacter::SphereInteraction()
 //			staticMeshActor->SetMobility(EComponentMobility::Movable);
 //
 //			const FVector forwardingVector = GetActorLocation() + GetActorRotation().Vector() * 100.0f;
-//			const FVector UpwardingdingVector = GetActorUpVector() * 50.0f;
-//			const FVector spawnLocation = forwardingVector + UpwardingdingVector;
+//			const FVector UpVector = GetActorUpVector() * 50.0f;
+//			const FVector spawnLocation = forwardingVector + UpVector;
 //
 //			staticMeshActor->SetActorLocation(spawnLocation);
 //			//Setting up component
@@ -199,10 +214,9 @@ void AChronoQuestCharacter::SphereInteraction()
 //			{
 //				meshComponentFromActor->SetIsReplicated(true);
 //				meshComponentFromActor->SetSimulatePhysics(true);
-//				if(sphereMesh != nullptr)
-//				{
-//					meshComponentFromActor->SetStaticMesh(sphereMesh);
-//				}
+
+//				meshComponentFromActor->SetStaticMesh(sphereMesh);
+//				
 //			}
 //		}
 //	}
@@ -259,6 +273,9 @@ void AChronoQuestCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 		// Interaction
 		EnhancedInputComponent->BindAction(Interaction, ETriggerEvent::Triggered, this, &AChronoQuestCharacter::IA_Interaction);
+
+		EnhancedInputComponent->BindAction(WalkRun, ETriggerEvent::Started, this, &ThisClass::GoWalk);
+		EnhancedInputComponent->BindAction(WalkRun, ETriggerEvent::Completed, this, &ThisClass::GoRun);
 	}
 	else
 	{
@@ -294,6 +311,36 @@ void AChronoQuestCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
 	}
+}
+
+void AChronoQuestCharacter::GoWalk()
+{
+	if(HasAuthority())
+	{
+		SetSpeed(WalkSpeed);
+	}else
+	{
+		SERVERRPC_SetWalkSpeed(WalkSpeed);
+		SetSpeed(WalkSpeed);
+
+	}
+
+	bIsWalking = true;
+}
+
+void AChronoQuestCharacter::GoRun()
+{
+	if (HasAuthority())
+	{
+		SetSpeed(RunSpeed);
+	}
+	else
+	{
+		SERVERRPC_SetWalkSpeed(RunSpeed);
+		SetSpeed(RunSpeed);
+	}
+
+	bIsWalking = false;
 }
 
 void AChronoQuestCharacter::Look(const FInputActionValue& Value)
