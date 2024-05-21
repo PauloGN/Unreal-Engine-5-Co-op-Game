@@ -49,6 +49,10 @@ class AChronoQuestCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* Interaction;
 
+	/** WalkRun Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* WalkRun;
+
 public:
 	AChronoQuestCharacter();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -57,6 +61,12 @@ protected:
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
+
+	/** Called for Jump input */
+	void GoWalk();
+
+	/** Called for Jump input */
+	void GoRun();
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
@@ -99,6 +109,23 @@ public:
 private:
 
 	void SphereInteraction();
+
+#pragma endregion
+
+#pragma region Walk Run
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void SERVERRPC_SetWalkSpeed(const float Speed);
+
+	void SetSpeed(const float Speed);
+
+	UPROPERTY(EditAnywhere, Category = "Character Properties")
+	float WalkSpeed = 100;
+
+	UPROPERTY(EditAnywhere, Category = "Character Properties")
+	float RunSpeed = 700;
+
+	bool bIsWalking = false;
 
 #pragma endregion
 
