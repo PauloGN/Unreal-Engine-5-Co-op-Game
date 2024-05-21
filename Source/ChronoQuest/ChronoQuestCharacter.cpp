@@ -189,8 +189,8 @@ void AChronoQuestCharacter::SphereInteraction()
 //			staticMeshActor->SetMobility(EComponentMobility::Movable);
 //
 //			const FVector forwardingVector = GetActorLocation() + GetActorRotation().Vector() * 100.0f;
-//			const FVector UpwardingdingVector = GetActorUpVector() * 50.0f;
-//			const FVector spawnLocation = forwardingVector + UpwardingdingVector;
+//			const FVector UpVector = GetActorUpVector() * 50.0f;
+//			const FVector spawnLocation = forwardingVector + UpVector;
 //
 //			staticMeshActor->SetActorLocation(spawnLocation);
 //			//Setting up component
@@ -199,10 +199,9 @@ void AChronoQuestCharacter::SphereInteraction()
 //			{
 //				meshComponentFromActor->SetIsReplicated(true);
 //				meshComponentFromActor->SetSimulatePhysics(true);
-//				if(sphereMesh != nullptr)
-//				{
-//					meshComponentFromActor->SetStaticMesh(sphereMesh);
-//				}
+
+//				meshComponentFromActor->SetStaticMesh(sphereMesh);
+//				
 //			}
 //		}
 //	}
