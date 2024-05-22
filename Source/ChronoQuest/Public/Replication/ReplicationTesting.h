@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interactions/InteractInterface.h"
 #include "ReplicationTesting.generated.h"
 
 UCLASS()
-class CHRONOQUEST_API AReplicationTesting : public AActor
+class CHRONOQUEST_API AReplicationTesting : public AActor, public IInteractInterface
 {
 	GENERATED_BODY()
 	
@@ -21,6 +22,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void OnInteracted(AChronoQuestCharacter* myCharacter) override;
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SERVERRPC_Testing();

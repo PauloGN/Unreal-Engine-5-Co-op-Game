@@ -17,6 +17,7 @@ AReplicationTesting::AReplicationTesting()
 
 	SetRootComponent(Mesh);
 
+	Mesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 }
 
 void AReplicationTesting::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -29,6 +30,12 @@ void AReplicationTesting::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AReplicationTesting::OnInteracted(AChronoQuestCharacter* myCharacter)
+{
+	int32 ID = static_cast<int32>(GPlayInEditorID);
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("%d : Has interface"), ID));
 }
 
 void AReplicationTesting::SERVERRPC_Testing_Implementation()
