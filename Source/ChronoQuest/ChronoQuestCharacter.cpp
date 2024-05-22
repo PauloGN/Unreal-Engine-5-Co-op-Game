@@ -274,8 +274,12 @@ void AChronoQuestCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 		// Interaction
 		EnhancedInputComponent->BindAction(Interaction, ETriggerEvent::Triggered, this, &AChronoQuestCharacter::IA_Interaction);
 
+		//Walk Run
 		EnhancedInputComponent->BindAction(WalkRun, ETriggerEvent::Started, this, &ThisClass::GoWalk);
 		EnhancedInputComponent->BindAction(WalkRun, ETriggerEvent::Completed, this, &ThisClass::GoRun);
+
+		//Final action
+		EnhancedInputComponent->BindAction(IA_Action, ETriggerEvent::Started, this, &ThisClass::GoRun);
 	}
 	else
 	{
@@ -322,7 +326,6 @@ void AChronoQuestCharacter::GoWalk()
 	{
 		SERVERRPC_SetWalkSpeed(WalkSpeed);
 		SetSpeed(WalkSpeed);
-
 	}
 
 	bIsWalking = true;
@@ -339,6 +342,8 @@ void AChronoQuestCharacter::GoRun()
 		SERVERRPC_SetWalkSpeed(RunSpeed);
 		SetSpeed(RunSpeed);
 	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Server id: ")));
 
 	bIsWalking = false;
 }
