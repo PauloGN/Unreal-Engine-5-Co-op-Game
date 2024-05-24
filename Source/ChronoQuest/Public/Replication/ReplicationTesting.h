@@ -27,6 +27,9 @@ protected:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SERVERRPC_Testing();
 
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MulticastRPC_Testing();
+
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMeshComponent> Mesh;
 
@@ -35,7 +38,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* ParticleEffect;
 
 
 };
