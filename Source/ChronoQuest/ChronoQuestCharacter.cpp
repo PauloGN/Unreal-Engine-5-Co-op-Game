@@ -183,13 +183,13 @@ void AChronoQuestCharacter::SetSpeed(const float Speed)
 	GetCharacterMovement()->MaxWalkSpeed = Speed;
 }
 
-void AChronoQuestCharacter::SERVERRPC_SetSpawnEmitter_Implementation(AReplicationTesting* actor)
+void AChronoQuestCharacter::Server_InteractionCall_Implementation(AReplicationTesting* actor)
 {
 	actor->SetOwner(this);
-	MulticastRRPC_SetSpawnEmitter(actor);
+	Multicast_InteractionCall(actor);
 }
 
-void AChronoQuestCharacter::MulticastRRPC_SetSpawnEmitter_Implementation(AReplicationTesting* actor)
+void AChronoQuestCharacter::Multicast_InteractionCall_Implementation(AReplicationTesting* actor)
 {
 	actor->SetOwner(this);
 	actor->MulticastRPC_Testing_Implementation();

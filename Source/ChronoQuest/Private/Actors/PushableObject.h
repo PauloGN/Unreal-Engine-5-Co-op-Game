@@ -63,6 +63,4 @@ private:
 	bool CheckAreaByCapsuleTracedByChanel(AChronoQuestCharacter* myCharacter) const;
 	bool CheckFowardObjectWithLineTraceByChanel(AChronoQuestCharacter* myCharacter) const;
 
-	// Declare a timer handle to manage the timer
-	FTimerHandle CharacterTransformTimerHandle;
 };

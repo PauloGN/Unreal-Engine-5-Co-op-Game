@@ -135,14 +135,14 @@ private:
 #pragma endregion
 
 
-#pragma region Spawn
+#pragma region Interaction Call
 
 public:
 	UFUNCTION(Server, Reliable)
-	void SERVERRPC_SetSpawnEmitter(AReplicationTesting* actor);
+	void Server_InteractionCall(AReplicationTesting* actor);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRRPC_SetSpawnEmitter(AReplicationTesting* actor);
+	void Multicast_InteractionCall(AReplicationTesting* actor);
 
 #pragma endregion
 

@@ -46,13 +46,13 @@ void AReplicationTesting::OnInteracted(AChronoQuestCharacter* MyCharacter)
         if (HasAuthority())
         {
             GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("%d : Spawn "), ID));
-            MyCharacter->MulticastRRPC_SetSpawnEmitter(this);
+            MyCharacter->Multicast_InteractionCall(this);
         }
         else
         {
            // MyCharacter->
             GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("%d : Client "), ID));
-            MyCharacter->SERVERRPC_SetSpawnEmitter(this);
+            MyCharacter->Server_InteractionCall(this);
         }
     }
     else
