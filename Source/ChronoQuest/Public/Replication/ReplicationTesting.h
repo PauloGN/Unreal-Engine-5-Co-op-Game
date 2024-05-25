@@ -24,7 +24,7 @@ protected:
 
 	virtual void OnInteracted(AChronoQuestCharacter* myCharacter) override;
 
-	UFUNCTION(Server, Reliable, BlueprintCallable)
+	UFUNCTION(Server, Reliable)
 	void SERVERRPC_Testing();
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
