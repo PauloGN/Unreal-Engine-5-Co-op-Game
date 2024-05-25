@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interactions/InteractInterface.h"
+#include "Interactions/RCPCallsInterface.h"
 #include "ReplicationTesting.generated.h"
 
 UCLASS()
-class CHRONOQUEST_API AReplicationTesting : public AActor, public IInteractInterface
+class CHRONOQUEST_API AReplicationTesting : public AActor, public IInteractInterface, public IRCPCallsInterface
 {
 	GENERATED_BODY()
 	
@@ -23,9 +24,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void OnInteracted(AChronoQuestCharacter* myCharacter) override;
-
+	
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void MulticastRPC_Testing();
+	virtual void MulticastRPC_SpawnEffects() override;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMeshComponent> Mesh;

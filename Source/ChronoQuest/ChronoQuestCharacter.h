@@ -139,10 +139,10 @@ private:
 
 public:
 	UFUNCTION(Server, Reliable)
-	void Server_InteractionCall(AReplicationTesting* actor);
+	void Server_InteractionCall(AActor* actor);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_InteractionCall(AReplicationTesting* actor);
+	void Multicast_InteractionCall(AActor* actor);
 
 #pragma endregion
 

@@ -183,16 +183,30 @@ void AChronoQuestCharacter::SetSpeed(const float Speed)
 	GetCharacterMovement()->MaxWalkSpeed = Speed;
 }
 
-void AChronoQuestCharacter::Server_InteractionCall_Implementation(AReplicationTesting* actor)
+void AChronoQuestCharacter::Server_InteractionCall_Implementation(AActor* actor)
 {
 	actor->SetOwner(this);
 	Multicast_InteractionCall(actor);
 }
 
-void AChronoQuestCharacter::Multicast_InteractionCall_Implementation(AReplicationTesting* actor)
+void AChronoQuestCharacter::Multicast_InteractionCall_Implementation(AActor* actor)
 {
 	actor->SetOwner(this);
-	actor->MulticastRPC_Testing_Implementation();
+
+	// Check if the overlapping actor implements a specific interface
+	if (actor->GetClass()->ImplementsInterface(URCPCallsInterface::StaticClass()))
+	{
+		// Cast to the interface
+		IRCPCallsInterface* RPCInterface = Cast<IRCPCallsInterface>(actor);
+		if (RPCInterface)
+		{
+			// Call interface function with tag condition
+			if(actor->ActorHasTag("Explosion"))
+			{
+				RPCInterface->MulticastRPC_SpawnEffects();
+			}
+		}
+	}
 }
 
 #pragma region RPC

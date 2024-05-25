@@ -61,7 +61,7 @@ void AReplicationTesting::OnInteracted(AChronoQuestCharacter* MyCharacter)
     }
 }
 
-void AReplicationTesting::MulticastRPC_Testing_Implementation()
+void AReplicationTesting::MulticastRPC_SpawnEffects_Implementation()
 {
     int Id = static_cast<int32>(GPlayInEditorID);
     GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Multicast id: %d"), Id));
@@ -79,4 +79,3 @@ void AReplicationTesting::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
