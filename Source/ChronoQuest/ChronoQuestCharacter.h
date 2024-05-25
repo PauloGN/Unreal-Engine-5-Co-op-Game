@@ -13,6 +13,7 @@ class UInputMappingContext;
 class UInputAction;
 class UPushComponent;
 struct FInputActionValue;
+class AReplicationTesting;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -132,6 +133,19 @@ private:
 	bool bIsWalking = false;
 
 #pragma endregion
+
+
+#pragma region Spawn
+
+public:
+	UFUNCTION(Server, Reliable)
+	void SERVERRPC_SetSpawnEmitter(AReplicationTesting* actor);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRRPC_SetSpawnEmitter(AReplicationTesting* actor);
+
+#pragma endregion
+
 
 #pragma region RPC
 

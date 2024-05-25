@@ -45,14 +45,14 @@ void AReplicationTesting::OnInteracted(AChronoQuestCharacter* MyCharacter)
     {
         if (HasAuthority())
         {
-            MulticastRPC_Testing();
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("%d : Spawn "), ID));
+            MyCharacter->MulticastRRPC_SetSpawnEmitter(this);
         }
         else
         {
-            SetOwner( GetGameInstance()->GetWorld()->GetFirstPlayerController());
-
-            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("%d : Client "), ID));
-            SERVERRPC_Testing();
+           // MyCharacter->
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("%d : Client "), ID));
+            MyCharacter->SERVERRPC_SetSpawnEmitter(this);
         }
     }
     else
@@ -72,14 +72,6 @@ void AReplicationTesting::MulticastRPC_Testing_Implementation()
         UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleEffect, GetActorLocation(), FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
     }
 }
-
-void AReplicationTesting::SERVERRPC_Testing_Implementation()
-{
-    // Only the server should call the multicast function to ensure it propagates to all clients
-    GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Purple, TEXT("SERVERRPC_Testing called on Server"));
-    MulticastRPC_Testing();
-}
-
 
 // Called every frame
 void AReplicationTesting::Tick(float DeltaTime)

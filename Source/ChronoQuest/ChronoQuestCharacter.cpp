@@ -17,6 +17,7 @@
 #include "Components/WidgetComponent.h"
 #include "Interactions/InteractInterface.h"
 #include "Interactions/PushComponent.h"
+#include <Replication/ReplicationTesting.h>
 //#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -180,6 +181,18 @@ bool AChronoQuestCharacter::SERVERRPC_SetWalkSpeed_Validate(const float Speed)
 void AChronoQuestCharacter::SetSpeed(const float Speed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = Speed;
+}
+
+void AChronoQuestCharacter::SERVERRPC_SetSpawnEmitter_Implementation(AReplicationTesting* actor)
+{
+	actor->SetOwner(this);
+	MulticastRRPC_SetSpawnEmitter(actor);
+}
+
+void AChronoQuestCharacter::MulticastRRPC_SetSpawnEmitter_Implementation(AReplicationTesting* actor)
+{
+	actor->SetOwner(this);
+	actor->MulticastRPC_Testing_Implementation();
 }
 
 #pragma region RPC
