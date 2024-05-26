@@ -134,18 +134,13 @@ private:
 
 #pragma endregion
 
-
 #pragma region Interaction Call
 
 public:
 	UFUNCTION(Server, Reliable)
 	void Server_InteractionCall(AActor* actor);
 
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_InteractionCall(AActor* actor);
-
 #pragma endregion
-
 
 #pragma region RPC
 

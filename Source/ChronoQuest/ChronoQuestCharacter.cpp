@@ -17,7 +17,7 @@
 #include "Components/WidgetComponent.h"
 #include "Interactions/InteractInterface.h"
 #include "Interactions/PushComponent.h"
-#include <Replication/ReplicationTesting.h>
+#include "Interactions/RCPCallsInterface.h"
 //#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -183,31 +183,28 @@ void AChronoQuestCharacter::SetSpeed(const float Speed)
 	GetCharacterMovement()->MaxWalkSpeed = Speed;
 }
 
+#pragma region Interaction Call
+
 void AChronoQuestCharacter::Server_InteractionCall_Implementation(AActor* actor)
 {
-	actor->SetOwner(this);
-	Multicast_InteractionCall(actor);
-}
-
-void AChronoQuestCharacter::Multicast_InteractionCall_Implementation(AActor* actor)
-{
-	actor->SetOwner(this);
-
-	// Check if the overlapping actor implements a specific interface
-	if (actor->GetClass()->ImplementsInterface(URCPCallsInterface::StaticClass()))
+	if(HasAuthority())
 	{
-		// Cast to the interface
-		IRCPCallsInterface* RPCInterface = Cast<IRCPCallsInterface>(actor);
-		if (RPCInterface)
+		actor->SetOwner(this);
+		// Check if the overlapping actor implements a specific interface
+		if (actor->GetClass()->ImplementsInterface(URCPCallsInterface::StaticClass()))
 		{
-			// Call interface function with tag condition
-			if(actor->ActorHasTag("Explosion"))
+			// Cast to the interface
+			IRCPCallsInterface* RPCInterface = Cast<IRCPCallsInterface>(actor);
+			if (RPCInterface)
 			{
-				RPCInterface->MulticastRPC_SpawnEffects();
+				// Call interface function with tag condition
+				RPCInterface->MulticastRPC_OnInteracted();
 			}
 		}
 	}
 }
+
+#pragma endregion
 
 #pragma region RPC
 

@@ -26,7 +26,7 @@ protected:
 	virtual void OnInteracted(AChronoQuestCharacter* myCharacter) override;
 	
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	virtual void MulticastRPC_SpawnEffects() override;
+	virtual void MulticastRPC_OnInteracted() override;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMeshComponent> Mesh;

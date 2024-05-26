@@ -24,5 +24,5 @@ class CHRONOQUEST_API IRCPCallsInterface
 public:
 
 	UFUNCTION(NetMulticast, Reliable)
-	virtual void MulticastRPC_SpawnEffects() = 0;
+	virtual void MulticastRPC_OnInteracted() = 0;
 };
