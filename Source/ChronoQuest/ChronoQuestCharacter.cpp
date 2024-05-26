@@ -17,7 +17,7 @@
 #include "Components/WidgetComponent.h"
 #include "Interactions/InteractInterface.h"
 #include "Interactions/PushComponent.h"
-#include <Replication/ReplicationTesting.h>
+#include "Interactions/RCPCallsInterface.h"
 //#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -183,17 +183,28 @@ void AChronoQuestCharacter::SetSpeed(const float Speed)
 	GetCharacterMovement()->MaxWalkSpeed = Speed;
 }
 
-void AChronoQuestCharacter::Server_InteractionCall_Implementation(AReplicationTesting* actor)
+#pragma region Interaction Call
+
+void AChronoQuestCharacter::Server_InteractionCall_Implementation(AActor* actor)
 {
-	actor->SetOwner(this);
-	Multicast_InteractionCall(actor);
+	if(HasAuthority())
+	{
+		actor->SetOwner(this);
+		// Check if the overlapping actor implements a specific interface
+		if (actor->GetClass()->ImplementsInterface(URCPCallsInterface::StaticClass()))
+		{
+			// Cast to the interface
+			IRCPCallsInterface* RPCInterface = Cast<IRCPCallsInterface>(actor);
+			if (RPCInterface)
+			{
+				// Call interface function with tag condition
+				RPCInterface->MulticastRPC_OnInteracted();
+			}
+		}
+	}
 }
 
-void AChronoQuestCharacter::Multicast_InteractionCall_Implementation(AReplicationTesting* actor)
-{
-	actor->SetOwner(this);
-	actor->MulticastRPC_Testing_Implementation();
-}
+#pragma endregion
 
 #pragma region RPC
 

@@ -39,18 +39,17 @@ void AReplicationTesting::OnInteracted(AChronoQuestCharacter* MyCharacter)
     int32 ID = static_cast<int32>(GPlayInEditorID);
     GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("%d : Has interface"), ID));
 
-    APlayerController* PlayerController = Cast<APlayerController>(MyCharacter->GetController());
+    const APlayerController* PlayerController = Cast<APlayerController>(MyCharacter->GetController());
 	this->SetOwner(MyCharacter->GetController());
     if (PlayerController)
     {
-        if (HasAuthority())
+        if (MyCharacter->HasAuthority())
         {
-            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("%d : Spawn "), ID));
-            MyCharacter->Multicast_InteractionCall(this);
+            GEngine->AddOnScreenDebugMessage(10, 5.0f, FColor::Green, FString::Printf(TEXT("%d : Spawn "), ID));
+            MulticastRPC_OnInteracted();
         }
-        else
+        else if(MyCharacter->IsLocallyControlled())
         {
-           // MyCharacter->
             GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("%d : Client "), ID));
             MyCharacter->Server_InteractionCall(this);
         }
@@ -61,15 +60,19 @@ void AReplicationTesting::OnInteracted(AChronoQuestCharacter* MyCharacter)
     }
 }
 
-void AReplicationTesting::MulticastRPC_Testing_Implementation()
+void AReplicationTesting::MulticastRPC_OnInteracted_Implementation()
 {
     int Id = static_cast<int32>(GPlayInEditorID);
     GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Multicast id: %d"), Id));
 
-    // Emit particles on both server and clients
-    if (!IsRunningDedicatedServer())
+    if(ActorHasTag("Explosion"))
     {
-        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleEffect, GetActorLocation(), FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
+	    // Emit particles on both server and clients
+	    if (!IsRunningDedicatedServer())
+	    {
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Explosion: %d"), Id));
+	        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleEffect, GetActorLocation(), FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
+	    }
     }
 }
 
@@ -77,6 +80,4 @@ void AReplicationTesting::MulticastRPC_Testing_Implementation()
 void AReplicationTesting::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
-
